@@ -1,6 +1,7 @@
 import StepOne from "./components/register/StepOne";
 import StepTwo from "./components/register/StepTwo";
 import StepThree from "./components/register/StepThree";
+import Stepper from "./components/register/Stepper";
 
 
 
@@ -58,6 +59,7 @@ const StepWizard = () => {
   };
 
   return (
+    
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-5xl bg-white  shadow-lg rounded-lg p-8 h-[550px] overflow-y-auto">
       <div className="flex justify-between mt-6">  
@@ -71,6 +73,7 @@ const StepWizard = () => {
           {/* <h1 className="text-2xl font-bold text-center text-gray-700">
          Paso {currentStep}
         </h1> */}
+        <Stepper />
 
           <button
             onClick={nextStep}
