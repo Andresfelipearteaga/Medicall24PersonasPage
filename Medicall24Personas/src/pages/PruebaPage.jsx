@@ -1,11 +1,12 @@
-import StepOne from "./components/register/StepOne";
-import StepTwo from "./components/register/StepTwo";
-import StepThree from "./components/register/StepThree";
-import Stepper from "./components/register/Stepper";
+import StepOne from "../components/register/StepOne";
+import StepTwo from "../components/register/StepTwo";
+import StepThree from "../components/register/StepThree";
+import Stepper from "../components/register/Stepper";
 
 
 
 import { useState } from "react";
+// import axios from "axios";
 
 const StepWizard = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -24,11 +25,11 @@ const StepWizard = () => {
     switch (step) {
       case 1:
         return (
-          <StepOne onRegisterData={onRegisterData} />
+          <StepOne onRegisterData={onRegisterData} status={status} />
         );
       case 2:
         return (
-          <StepTwo />
+          <StepTwo payload={payload}/>
         );
       case 3:
         return (
@@ -53,16 +54,26 @@ const StepWizard = () => {
     }
   };
 
-
+  const [payload, setPayload] = useState({});
+  const [status, setStatus] = useState(null);
+  
   const onRegisterData = (data) => {
-    console.log(data);
+    setPayload(data);
+    console.log('payload', payload);
   };
+
+  const fetchData = async () => {
+    setStatus(200);
+  };
+
+
 
   return (
     
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-5xl bg-white  shadow-lg rounded-lg p-8 h-[550px] overflow-y-auto">
+      <div className="w-full max-w-5xl bg-white  shadow-lg rounded-lg p-8">
       <div className="flex justify-between mt-6">  
+
           <button
             onClick={prevStep}
             disabled={currentStep === 1}
@@ -73,8 +84,10 @@ const StepWizard = () => {
           {/* <h1 className="text-2xl font-bold text-center text-gray-700">
          Paso {currentStep}
         </h1> */}
-        <Stepper />
+                <Stepper currentStep={currentStep} />
 
+
+        {status === 200 ? 
           <button
             onClick={nextStep}
             disabled={currentStep === 6}
@@ -82,6 +95,14 @@ const StepWizard = () => {
           >
             Siguiente
           </button>
+          :
+          <button
+            onClick={fetchData}
+            className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all"
+          >
+            Registrarse
+          </button>
+          }
         </div>
         
 

@@ -2,40 +2,30 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import PropTypes from "prop-types";
 
-
-
-const StepOne = ({ onRegisterData }) => {
+const StepOne = ({ onRegisterData, modalOpen, next }) => {
 
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [correctMessage, setCorrectMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [passwordError, setPasswordError] = useState(false);
+  const [isValid, setIsValid] = useState(false);
 
   const [typeIds, setTypeIds] = useState([]);
-  const [formData, setFormData] = useState({
-    identification: "",
-    typeId: "",
-    password: "",
-    name1: "",
-    name2: "",
-    lastName1: "",
-    lastName2: "",
-    gender: "",
-    birthday: "",
-    email: "",
-    myProperty: 9999,
-    phone: "",
-    address: "",
-    country: "",
-    departmentId: "23",
-    municipalityId: 429,
-    activityId: 9999,
-    civilStatus: "",
-    personInCharge: "",
-    relationshipPerson: "",
-    phonePerson: "",
-    avatar: ""
-    
+  const [formErrors, setFormErrors] = useState({
+    identification: '',
+    email: '',
+  });  const [formData, setFormData] = useState({
+    user: {
+        identification: '',
+        typeId: '',
+        name1: '',
+        name2: '',
+        lastName1: '',
+        lastName2: '',
+        email: '',
+        password: '',
+      },
+      epsId: 0, 
+      regimenId: 0,
   });
 
     // Cargar tipos de identificación
@@ -52,73 +42,142 @@ const StepOne = ({ onRegisterData }) => {
         fetchTypeIds();
       }, []);
 
+      // Validar identificación
+    const validateIdentification = (value) => {
+        if (!/^[0-9]*$/.test(value)) {
+        setFormErrors((prev) => ({ ...prev, identification: 'La identificación solo debe contener números.' }));
+        } else {
+        setFormErrors((prev) => ({ ...prev, identification: '' }));
+        }
+    };
+
+      // Validar correo electrónico
+    const validateEmail = (value) => {
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
+        setFormErrors((prev) => ({ ...prev, email: 'Este campo debe contener un correo electrónico válido.' }));
+        } else {
+        setFormErrors((prev) => ({ ...prev, email: '' }));
+        }
+    };
 
       // Manejar cambio en el formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === 'identification') validateIdentification(value);
+    if (name === 'email') validateEmail(value);
+
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      user: {
+        ...prevData.user,
+        [name]: value,
+      },
       
     }));
-
-
     };
+
+    const checkUserRegistration = async () => {
+        const { typeId, identification } = formData.user;
+    
+        if (typeId && identification) {
+          try {
+            const response = await axios.post(
+              "https://medicallapi-test.azurewebsites.net/api/Users/GetUser",
+              { identification, typeId }
+            );
+            const DataUser = response.data.user;
+            console.log(DataUser);
+            if (DataUser) {
+              setFormData((prev) => ({
+                ...prev,
+                user: {
+                    ...prev.user,
+                    identification: DataUser.identification,
+                    typeId: DataUser.typeId,
+                    name1: DataUser.name1,
+                    name2: DataUser.name2,
+                    lastName1: DataUser.lastname1,
+                    lastName2: DataUser.lastname2,
+                    email: DataUser.email,
+                    password: DataUser.password,
+                },
+            }));
+
+            console.log("modal", true);
+            modalOpen(true);
+            } else {
+            modalOpen(false);            }
+          } catch (error) {
+            console.error("Error al verificar el usuario:", error);
+          }
+        }
+      };
+
 
    // Pasar datos al componente padre
    useEffect(() => {
     onRegisterData(formData);
   }, [formData, onRegisterData]);
 
+
+  useEffect(() => {
+    const { name1, lastName1, email, identification, password } = formData.user;
+    const allFieldsValid = name1 && lastName1 && email && identification && !formErrors.email && !formErrors.identification;
+    const passwordsMatch = password === confirmPassword && !passwordError;
+
+    setIsValid(allFieldsValid && passwordsMatch);
+
+}, [formData, confirmPassword, passwordError, formErrors]);
+
+ useEffect(() => {
+    next(isValid);
+  }, [isValid, next]);
  
 
 
   // Manejar cambios en los campos para Validar si las contraseñas coinciden
-  const handleChangePassword = (e) => {
+// Manejar cambios en los campos para Validar si las contraseñas coinciden
+const handleChangePassword = (e) => {
     const { name, value } = e.target;
-
+  
     if (name === 'password') {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-
+      setFormData((prev) => ({
+        ...prev,
+        user: {
+          ...prev.user,
+          [name]: value
+        }
+      }));
+  
       // Verificar inmediatamente si las contraseñas coinciden
       if (confirmPassword && value !== confirmPassword) {
         setPasswordError(true);
         setErrorMessage('Las contraseñas no coinciden.');
-    } else if (confirmPassword && value === confirmPassword) {
+      } else if (confirmPassword && value === confirmPassword) {
         setPasswordError(false);
         setErrorMessage('');
-        setCorrectMessage('Las contraseñas coinciden.');
-      } else {
-        setCorrectMessage('');
       }
     }
-
+  
     if (name === 'confirmPassword') {
       setConfirmPassword(value);
-
+  
       // Validar confirmación de contraseña
-      if (value !== formData.password) {
+      if (value !== formData.user.password) {
         setPasswordError(true);
         setErrorMessage('Las contraseñas no coinciden.');
-        setCorrectMessage('');
       } else {
         setPasswordError(false);
         setErrorMessage('');
-        setCorrectMessage('Las contraseñas coinciden.');
       }
     }
-
   };
 
-  
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
-  };
 
   return (
       <div className="bg-white rounded-lg p-6 w-full">
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <form className="space-y-6">
           {/* Fila 1 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -127,8 +186,9 @@ const StepOne = ({ onRegisterData }) => {
                 required
                 id="typeId"
                 name="typeId"
-                value={formData.typeId}
+                value={formData.user.typeId || ""}
                 onChange={handleChange}
+                onBlur={checkUserRegistration}
                 className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               >
                 <option value="">Seleccione</option>
@@ -141,29 +201,33 @@ const StepOne = ({ onRegisterData }) => {
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-1" htmlFor="identification">Identificación</label>
+              <label className="block text-gray-700 font-medium mb-1" htmlFor="identification"><span className="text-red-600">*</span> Identificación</label>
               <input
                 required
                 type="text"
                 id="identification"
                 name="identification"
-                value={formData.identification}
+                value={formData.user.identification || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
-              />
+                onBlur={checkUserRegistration}
+                className={`w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${formErrors.identification ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'}`}
+                />
+                {formErrors.identification && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.identification}</p>
+                )}
             </div>
           </div>
 
           {/* Fila 2 */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-gray-700 font-medium mb-1" htmlFor="name1">Primer Nombre</label>
+              <label className="block text-gray-700 font-medium mb-1" htmlFor="name1"><span className="text-red-600">*</span> Primer Nombre</label>
               <input
                 required
                 type="text"
                 id="name1"
                 name="name1"
-                value={formData.name1}
+                value={formData.user.name1 || ""}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               />
@@ -175,20 +239,20 @@ const StepOne = ({ onRegisterData }) => {
                 type="text"
                 id="name2"
                 name="name2"
-                value={formData.name2}
+                value={formData.user.name2 || ""}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-1" htmlFor="lastName1">Primer Apellido</label>
+              <label className="block text-gray-700 font-medium mb-1" htmlFor="lastName1"><span className="text-red-600">*</span> Primer Apellido</label>
               <input
                 type="text"
                 required
                 id="lastName1"
                 name="lastName1"
-                value={formData.lastName1}
+                value={formData.user.lastName1 || ""}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               />
@@ -200,7 +264,7 @@ const StepOne = ({ onRegisterData }) => {
                 type="text"
                 id="lastName2"
                 name="lastName2"
-                value={formData.lastName2}
+                value={formData.user.lastName2 || ""}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               />
@@ -210,35 +274,38 @@ const StepOne = ({ onRegisterData }) => {
           {/* Fila 3 */}
           <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
           <div>
-              <label className="block text-gray-700 font-medium mb-1" htmlFor="name1">Correo Electrónico</label>
+              <label className="block text-gray-700 font-medium mb-1" htmlFor="name1"><span className="text-red-600">*</span> Correo Electrónico</label>
               <input
                 required
                 type="email"
                 id="email"
                 name="email"
-                value={formData.email}
+                value={formData.user.email || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
-              />
+                className={`w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${formErrors.email ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'}`}
+                />
+                {formErrors.email && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>
+                )}
             </div>
           </div>
 
          {/* Fila 4 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-gray-700 font-medium mb-1" htmlFor="name2">Contraseña</label>
+              <label className="block text-gray-700 font-medium mb-1" htmlFor="name2"><span className="text-red-600">*</span> Contraseña</label>
               <input
                 required
                 type="password"
                 id="password"
                 name="password"
-                value={formData.password}
+                value={formData.user.password || ""}
                 onChange={handleChangePassword}
                 className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-medium mb-1" htmlFor="lastName1">Confirmar Contraseña</label>
+              <label className="block text-gray-700 font-medium mb-1" htmlFor="lastName1"><span className="text-red-600">*</span> Confirmar Contraseña</label>
               <input
                 required
                 type="password"
@@ -253,14 +320,10 @@ const StepOne = ({ onRegisterData }) => {
                       {passwordError && (
           <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
         )}
-                        {correctMessage && (
-          <p className="text-green-600 text-sm mt-1">{correctMessage}</p>
-        )}
             </div>
           </div>    
-
-          <input type="submit" value="Registrar" />
         </form>
+        <p className="mt-5"><span className="text-red-600" >*</span>Campos obligatorios</p>
       </div>
  
   );
@@ -272,4 +335,7 @@ export default StepOne;
 
 StepOne.propTypes = {
   onRegisterData: PropTypes.func,
+  status: PropTypes.number,
+  modalOpen: PropTypes.func,
+  next: PropTypes.func,
 };
