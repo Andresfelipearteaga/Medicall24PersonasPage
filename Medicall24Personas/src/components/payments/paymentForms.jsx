@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import card from "../../assets/SVG/card.svg";
 import pse from "../../assets/SVG/pse.svg";
 import ban from "../../assets/SVG/Ban.svg";
 import nequi from "../../assets/SVG/nequi.svg";
 
+import axios from "axios";
+
 const PaymentForm = ({ onFormDataChange }) => {
   const [selectedMethod, setSelectedMethod] = useState("CARD");
+  const [bankPse, setBankPse] = useState([]);
   const [formDataPayment, setFormDataPayment] = useState({
     type: selectedMethod
   });
@@ -14,18 +17,35 @@ const PaymentForm = ({ onFormDataChange }) => {
     setFormDataPayment((prev) => {
       const updatedData = { ...prev, [field]: value };
       onFormDataChange(updatedData);
+      console.log('updatedData payment', updatedData);
       return updatedData;
     });
   };
+
 
   const handleMethodChange = (method) => {
     setSelectedMethod(method);
     setFormDataPayment({
       type: method
     });
-    setFormDataPayment({}); // Limpiar los datos al cambiar el método
-    onFormDataChange({ type: method,}); // Informar al componente padre del cambio
+    onFormDataChange({ type: method,}); 
+    console.log('formDataPayment', formDataPayment);
   };
+
+  const loadBankPse = async () => {
+      try {
+        const response = await axios.get('https://medicallapi.azurewebsites.net/api/Payments/FinancialInstitutions'
+        );
+      console.log(response.data);
+      setBankPse(response.data.data);
+      } catch (error) {
+        console.error("Error al cargar el banco:", error);
+      }
+    }
+
+    useEffect(() => {
+      loadBankPse();
+    }, []);
 
   const renderForm = () => {
     switch (selectedMethod) {
@@ -43,7 +63,7 @@ const PaymentForm = ({ onFormDataChange }) => {
                   id="cardNumber"
                   placeholder="XXXXXXXXXXXXXXXX"
                   className="w-full p-2 border border-gray-300 rounded"
-                  onChange={(e) => handleInputChange("number", e.target.value)}
+                  onBlur={(e) => handleInputChange("number", e.target.value)}
                 />
               </div>
               <div>
@@ -55,7 +75,7 @@ const PaymentForm = ({ onFormDataChange }) => {
                   id="cardName"
                   placeholder=""
                   className="w-full p-2 border border-gray-300 rounded"
-                  onChange={(e) => handleInputChange("cardHolder", e.target.value)}
+                  onBlur={(e) => handleInputChange("cardHolder", e.target.value)}
                 />
               </div>
               <div className="flex gap-2 justify-between">
@@ -68,6 +88,7 @@ const PaymentForm = ({ onFormDataChange }) => {
                     className="p-2 border border-gray-300 rounded w-16 mr-2"
                     onChange={(e) => handleInputChange("expMonth", e.target.value)}
                   >
+                    <option value=""></option>
                     {Array.from({ length: 12 }, (_, i) => (
                       <option key={i} value={String(i + 1).padStart(2, "0")}>
                         {String(i + 1).padStart(2, "0")}
@@ -79,6 +100,7 @@ const PaymentForm = ({ onFormDataChange }) => {
                     className="p-2 border border-gray-300 rounded w-16"
                     onChange={(e) => handleInputChange("expYear", e.target.value)}
                   >
+                    <option value=""></option>
                     {Array.from({ length: 15 }, (_, i) => {
                       const year = new Date().getFullYear() + i;
                       const yearLastTwoDigits = year.toString().slice(-2);
@@ -99,6 +121,7 @@ const PaymentForm = ({ onFormDataChange }) => {
                     className="p-2 border border-gray-300 rounded w-20"
                     onChange={(e) => handleInputChange("installments", e.target.value)}
                   >
+                   <option value=""></option>
                     {Array.from({ length: 12 }, (_, i) => (
                       <option key={i} value={i + 1}>
                         {i + 1}
@@ -107,15 +130,15 @@ const PaymentForm = ({ onFormDataChange }) => {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="cvv" className="block font-medium mb-2">
-                    CVV
+                  <label htmlFor="cvc" className="block font-medium mb-2">
+                    CVC
                   </label>
                   <input
                     type="text"
                     id="cvv"
                     placeholder="XXX"
                     className="w-20 p-2 border border-gray-300 rounded"
-                    onChange={(e) => handleInputChange("cvc", e.target.value)}
+                    onBlur={(e) => handleInputChange("cvc", e.target.value)}
                   />
                 </div>
               </div>
@@ -134,69 +157,53 @@ const PaymentForm = ({ onFormDataChange }) => {
                 <select
                   id="person"
                   className="w-full p-2 border border-gray-300 rounded"
-                  onChange={(e) => handleInputChange("personType", e.target.value)}
+                  onBlur={(e) => handleInputChange("userType", e.target.value)}
                 >
-                  <option value="natural">Natural</option>
-                  <option value="juridica">Jurídica</option>
+                  <option value="" disabled>Seleccione tipo de persona</option>
+                  <option value="0">Natural</option>
+                  <option value="1">Jurídica</option>
                 </select>
               </div>
               <div>
                 <label htmlFor="bank" className="block font-medium mb-2">
-                  Banco
+                  Lista de Bancos
                 </label>
-                <input
-                  type="text"
+                <select
                   id="bank"
-                  placeholder="Nombre del Banco"
                   className="w-full p-2 border border-gray-300 rounded"
-                  onChange={(e) => handleInputChange("bank", e.target.value)}
-                />
+                  onBlur={(e) => handleInputChange("financialInstitutionCode", e.target.value)}
+                >
+                  {bankPse.map((bank) => (
+                    <option key={bank.financial_institution_code} value={bank.financial_institution_code}>
+                      {bank.financial_institution_name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </form>
           </div>
         );
       case "BANCOLOMBIA_TRANSFER":
         return (
-          <div className="animate-fade-in">
-            <h3 className="text-lg font-bold mb-4">Pago con Bancolombia</h3>
-            {/* <form className="space-y-4">
-              <div>
-                <label htmlFor="accountType" className="block font-medium mb-2">
-                  Tipo de Cuenta
-                </label>
-                <input
-                  type="text"
-                  id="accountType"
-                  placeholder="Ahorros / Corriente"
-                  className="w-full p-2 border border-gray-300 rounded"
-                  onChange={(e) => handleInputChange("accountType", e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="accountNumber" className="block font-medium mb-2">
-                  Número de Cuenta
-                </label>
-                <input
-                  type="text"
-                  id="accountNumber"
-                  placeholder="XXXXXXXXXX"
-                  className="w-full p-2 border border-gray-300 rounded"
-                  onChange={(e) => handleInputChange("accountNumber", e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="idNumber" className="block font-medium mb-2">
-                  Número de Identificación
-                </label>
-                <input
-                  type="text"
-                  id="idNumber"
-                  placeholder="XXXXXXXXX"
-                  className="w-full p-2 border border-gray-300 rounded"
-                  onChange={(e) => handleInputChange("idNumber", e.target.value)}
-                />
-              </div>
-            </form> */}
+          <div className="animate-fade-in flex flex-col items-center justify-center">
+            <h3 className="text-xl text-gray-700 font-bold mb-4 text-center">Pagarás con Bancolombia</h3>
+            <span
+                className="flex items-center justify-center w-16 h-16 border rounded-full shrink-0 transition-all bg-green-600">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-10 h-10"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="white"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+              </span>
           </div>
         );
       case "NEQUI":
@@ -213,7 +220,7 @@ const PaymentForm = ({ onFormDataChange }) => {
                   id="phoneNumber"
                   placeholder=""
                   className="w-full p-2 border border-gray-300 rounded"
-                  onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                  onBlur={(e) => handleInputChange("phoneNumber", e.target.value)}
                 />
               </div>
             </form>
@@ -223,13 +230,15 @@ const PaymentForm = ({ onFormDataChange }) => {
         return null;
     }
   };
-
   return (
-    <div className="max-w-lg mx-auto">
-      <h2 className="text-2xl font-bold text-gray-700 text-center mb-12 mt-6">
+    <div className="max-w-lg mx-auto flex flex-col">
+      {/* Título */}
+      <h2 className="text-2xl font-bold text-gray-700 text-center mb-6 mt-6">
         Selecciona un Método de Pago
       </h2>
-      <div className="flex justify-around mb-2">
+  
+      {/* Botones */}
+      <div className="flex justify-around mb-4">
         <button
           onClick={() => handleMethodChange("CARD")}
           className={`flex flex-col items-center justify-center w-18 h-18 px-4 rounded-lg ${
@@ -269,9 +278,14 @@ const PaymentForm = ({ onFormDataChange }) => {
           <span className="text-fuchsia-600 font-medium">Nequi</span>
         </button>
       </div>
-      <div className="p-4 border border-gray-300 rounded-lg">{renderForm()}</div>
+  
+      {/* Contenido fijo */}
+      <div className="flex-grow p-4 rounded-lg overflow-y-auto" style={{ minHeight: "250px" }}>
+        {renderForm()}
+      </div>
     </div>
   );
+  
 };
 
 export default PaymentForm;

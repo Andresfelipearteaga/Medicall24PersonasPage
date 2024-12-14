@@ -2,11 +2,15 @@ import { useState } from "react";
 // import axios from "axios";
 import PropTypes from "prop-types";
 import PaymentForm from "../payments/paymentForms";
+import { useDispatch } from "react-redux";
+import { setFormData } from "../../store/slices/formDataSlice";
+import { setLocalFormData } from "../../store/slices/dataAddSlice";
 
 
 const StepTwo = ({ payload, dataPayment }) => {
+  const dispatch = useDispatch();
 
-  const [localFormData, setLocalFormData] = useState({
+  const [localFormData, setLocalFormDataAdd] = useState({
     address: "",
     phone: "",
   });
@@ -25,48 +29,32 @@ const StepTwo = ({ payload, dataPayment }) => {
     fullLastName = lastNames;
   }
 
-      // Manejar cambio en el formulario
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     user: {
-  //       ...prevData.user,
-  //       [name]: value,
-  //     },
-      
-  //   }));
-
-
-  //   };
-
-   // Pasar datos al componente padre
-  //  useEffect(() => {
-  //   onRegisterData(formData);
-  // }, [formData, onRegisterData]);
-
     // Manejar cambios en los campos address y phone
     const handleChange = (e) => {
       const { name, value } = e.target;
-      setLocalFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
-      // Pasar los datos al componente padre en tiempo real
-      onFormDataChange({ ...localFormData, [name]: value });
+    
+      // Actualizar localFormData para los campos address y phone
+      setLocalFormDataAdd((prevData) => {
+        const updatedData = {
+          ...prevData,
+          [name]: value,
+        };
+        dispatch(setLocalFormData(updatedData));
+        return updatedData;
+
+      });
     };
 
+    // Pasar datos finales al componente padre
+    const onFormDataChange = (data) => {
+      const updatedData = {
+        ...payload.user, // Mantener los datos previos
+        ...data,   // Combinar con los datos del formulario
+              };
+      dispatch(setFormData(updatedData)); // Enviar los datos actualizados al padre
 
-  // Pasar datos finales al componente padre
-  const onFormDataChange = (data) => {
-    const updatedData = {
-      ...payload,
-      ...data,
     };
-    dataPayment(updatedData); // Envía los datos actualizados al padre
-    console.log('updatedData', updatedData);
-  };
+     
 
   return (
     <div className="bg-white rounded-lg p-6 w-full grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -166,7 +154,7 @@ const StepTwo = ({ payload, dataPayment }) => {
             id="email"
             name="email"
             value={payload.user.email}
-            className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200"
+            className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200 disabled:text-gray-600"
           />
         </div>
   

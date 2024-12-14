@@ -3,7 +3,6 @@ import axios from "axios";
 import PropTypes from "prop-types";
 
 const StepOne = ({ onRegisterData, modalOpen, next }) => {
-
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [passwordError, setPasswordError] = useState(false);
@@ -118,7 +117,7 @@ const StepOne = ({ onRegisterData, modalOpen, next }) => {
    // Pasar datos al componente padre
    useEffect(() => {
     onRegisterData(formData);
-  }, [formData, onRegisterData]);
+  }, [formData]);
 
 
   useEffect(() => {

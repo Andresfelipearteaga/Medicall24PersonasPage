@@ -1,0 +1,27 @@
+{
+    "typeId": "str",
+    "identification": "string",
+    "names": "string",
+    "lastNames": "string",
+    "email": "user@example.com",
+    "address": "string",
+    "phone": "string",
+    "productId": 15,
+    "paymentMethod": {
+      "type": "string",
+      "installments": 0,
+      "card": {
+        "number": "string",
+        "cvc": "string",
+        "expMonth": "string",
+        "expYear": "string",
+        "cardHolder": "string"
+      },
+      "userType": "string",
+      "paymentDescription": "Compra de Plan de telemedicina",
+      "phoneNumber": "string",
+      "userLegalIdType": "string",
+      "userLegalId": "string",
+      "financialInstitutionCode": "string"
+    }
+  }

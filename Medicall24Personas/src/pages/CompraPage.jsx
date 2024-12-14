@@ -3,10 +3,11 @@ import StepTwo from "../components/register/StepTwo";
 import StepThree from "../components/register/StepThree";
 import Stepper from "../components/register/Stepper";
 import Modal from "../components/modals/isRegistered";
+import pse from "../json/formPse.json";
+import { useSelector } from "react-redux";
 
 
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 // import axios from "axios";
 
 const StepWizard = () => {
@@ -15,73 +16,120 @@ const StepWizard = () => {
   const [status, setStatus] = useState(null);
   const [modal, setModal] = useState(false);
   const [disabled, setDisabled] = useState(false);
-  const [formDataPayment, setFormDataPayment] = useState({
-    typeId: "",
-    identification: "",
-    names: "",
-    lastNames: "",
-    email: "",
-    address: "",
-    phone: "",
-    productId: 15,
-    paymentMethod: {
-      type: "string",
-      installments: 0,
-      card: {
-        number: "string",
-        cvc: "string",
-        expMonth: "string",
-        expYear: "string",
-        cardHolder: "string"
-      },
-      userType: "PERSON",
-      paymentDescription: "Compra de Plan de telemedicina",
-      phoneNumber: "string",
-      userLegalIdType: "string",
-      userLegalId: "string",
-      financialInstitutionCode: 0
-  }
-});
+  const [formDataPayment, setFormDataPayment] = useState({});
 
-const updateNestedField = (obj, key, value) => {
-  for (const field in obj) {
-    if (field === key) {
-      obj[field] = value;
-    } else if (typeof obj[field] === "object" && obj[field] !== null) {
-      updateNestedField(obj[field], key, value);
-    }
-  }
-};
+  const formData = useSelector((state) => state.formData.formData);
+  const localFormData = useSelector((state) => state.localFormData);
 
-const dataPayment = (data) => {
-  const dataUser = data.user;
-  console.log('dataUser', dataUser);
-  setFormDataPayment((prevFormData) => {
-    const updatedFormData = { ...prevFormData };
+  const combinedFormData = {
+    ...formData,
+    ...localFormData,
+  }; 
 
-     // Actualizar campos específicos
-     if (data.typeId) {
-      updateNestedField(updatedFormData, "userLegalIdType", dataUser.typeId);
-    }
-    if (data.identification) {
-      updateNestedField(updatedFormData, "userLegalId", dataUser.identification);
+  useEffect(() => {
+    console.log('localFormData actualizado:', localFormData);
+  }, [localFormData]);
+
+
+  const validateFormData = () => {
+    console.log("formData", formData);
+    const type = formData.type;
+    console.log("type", type);
+    // Validación para "PSE"
+    if (type === "PSE") {
+      return (
+        formData.userType &&
+        formData.financialInstitutionCode &&
+        localFormData.address &&
+        localFormData.phone
+      );
     }
 
-    const combinedNames = [dataUser.name1, dataUser.name2].filter(Boolean).join(" ");
-    const combinedLastNames = [dataUser.lastName1, dataUser.lastName2].filter(Boolean).join(" ");
-
-    updateNestedField(updatedFormData, "names", combinedNames);
-    updateNestedField(updatedFormData, "lastNames", combinedLastNames);
-
-    for (const [key, value] of Object.entries(data)) {
-      updateNestedField(updatedFormData, key, value);
+    // Validación para "card"
+    if (type === "card") {
+      return (
+        formData.cardNumber &&
+        formData.expirationDate &&
+        formData.address &&
+        formData.phone
+      );
     }
-    console.log('dataformdata', formDataPayment);
-    return updatedFormData;
-  });
-};
+
+    // Validación para "ban" (puedes añadir más campos según sea necesario)
+    if (type === "ban") {
+      return formData.address && formData.phone;
+    }
+
+    // Agregar validaciones para otros tipos si es necesario
+    return false;
+  };
+
+  const isButtonDisabled = !validateFormData();
+
+
+
+  const updateNestedField = (obj, key, value) => {
+    for (const field in obj) {
+      if (field === key) {
+        obj[field] = value;
+      } else if (typeof obj[field] === "object" && obj[field] !== null) {
+        updateNestedField(obj[field], key, value);
+      }
+    }
+  };
+  const dataPayment = () => {
+    const type = combinedFormData.type || {}; // Obtener el tipo de pago del objeto recibido
+    console.log("Tipo de pago:", type);
+
+    let template = null;
+    if (type === "PSE") {
+      template = pse;
+    }
+    console.log("template", template);
+    setFormDataPayment(() => {
+      const updatedFormData = { ...template }; // Clonar la plantilla
+  
+      // Actualizar campos en la plantilla con los datos de `data`
+      if (combinedFormData) {
+  
+        if (combinedFormData.typeId) {
+          updateNestedField(updatedFormData, "userLegalIdType", combinedFormData.typeId);
+        }
+  
+        if (combinedFormData.identification) {
+          updateNestedField(updatedFormData, "userLegalId", combinedFormData.identification);
+        }
+  
+        const combinedNames = [combinedFormData.name1, combinedFormData.name2].filter(Boolean).join(" ");
+        const combinedLastNames = [combinedFormData.lastName1, combinedFormData.lastName2].filter(Boolean).join(" ");
+  
+        updateNestedField(updatedFormData, "names", combinedNames);
+        updateNestedField(updatedFormData, "lastNames", combinedLastNames);
+      }
+  
+      if (combinedFormData.phone) {
+        updateNestedField(updatedFormData, "phoneNumber", combinedFormData.phone);
+      }
+  
+      if (combinedFormData.email) {
+        updatedFormData.email = combinedFormData.email;
+      }
+  
+      // Llenar todos los demás campos genéricos
+      for (const [key, value] of Object.entries(combinedFormData)) {
+        updateNestedField(updatedFormData, key, value);
+      }
+  
+      console.log("updatedFormData", updatedFormData);
+      return updatedFormData;
+    });
+    console.log("formDataPayment", formDataPayment);
+    nextStep();
+
+  };
 
 const loadPayloadToFormData = (payload) => {
+  console.log('payload', payload);
   setFormDataPayment((prevFormData) => {
     const updatedFormData = { ...prevFormData };
 
@@ -134,7 +182,7 @@ const loadPayloadToFormData = (payload) => {
         );
       case 2:
         return (
-          <StepTwo payload={payload} dataPayment={dataPayment}/>
+          <StepTwo payload={payload}/>
         );
       case 3:
         return (
@@ -162,7 +210,7 @@ const loadPayloadToFormData = (payload) => {
   const onRegisterData = (data) => {
     setPayload(data);
     loadPayloadToFormData(data);
-    console.log('payload', payload);
+    // console.log('payload', payload);
   };
 
   const fetchData = async () => {
@@ -201,10 +249,10 @@ const loadPayloadToFormData = (payload) => {
                 <Stepper currentStep={currentStep} />
 
 
-        {status === 200 ? 
+        {currentStep === 2 ? 
           <button
-            onClick={nextStep}
-            disabled={currentStep === 6}
+            onClick={dataPayment}
+            disabled={isButtonDisabled}
             className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50"
           >
             Siguiente
@@ -226,10 +274,16 @@ const loadPayloadToFormData = (payload) => {
           className="transition duration-500 ease-in-out"
           key={currentStep}
         >
+  
+                <pre>{JSON.stringify(combinedFormData, null, 2)}</pre>
+
+
+
           {renderStepContent(currentStep)}
         </div>
 
-
+        
+        
       </div>
       <Modal isOpen={modal} message="Ya estás registrado, redirigiendo..." />
 
