@@ -3,20 +3,38 @@ import StepTwo from "../components/register/StepTwo";
 import StepThree from "../components/register/StepThree";
 import Stepper from "../components/register/Stepper";
 import Modal from "../components/modals/isRegistered";
+import ModalNotRegistered from "../components/modals/isNotRegistered";
+import FinallyNequi from "../components/finally/finallyNequi";
 import pse from "../json/formPse.json";
-import { useSelector } from "react-redux";
+import nequi from "../json/formNequi.json";
+import card from "../json/formCard.json";
+import ban from "../json/formBancolombia.json";
+import { useSelector, useDispatch } from "react-redux";
+import { setUpdatedFormDataPaid } from "../store/slices/paidObject";
+import usePreventUnload from "../hooks/usePreventUnload";
+
+
 
 
 import { useState, useEffect } from "react";
-// import axios from "axios";
+import axios from "axios";
 
 const StepWizard = () => {
+  const [isDirty, setIsDirty] = usePreventUnload();
+  const dispatch = useDispatch();
   const [currentStep, setCurrentStep] = useState(1);
   const [payload, setPayload] = useState({});
-  const [status, setStatus] = useState(null);
   const [modal, setModal] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [formDataPayment, setFormDataPayment] = useState({});
+  const [transaction, setTransaction] = useState(null);
+  const [paidObject, setPaidObject] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [height, setHeight] = useState(0);
+  const [isUserRegistered, setIsUserRegistered] = useState(false);
+
 
   const formData = useSelector((state) => state.formData.formData);
   const localFormData = useSelector((state) => state.localFormData);
@@ -27,14 +45,12 @@ const StepWizard = () => {
   }; 
 
   useEffect(() => {
-    console.log('localFormData actualizado:', localFormData);
   }, [localFormData]);
 
 
   const validateFormData = () => {
-    console.log("formData", formData);
-    const type = formData.type;
-    console.log("type", type);
+    console.log('formdata', formData);
+    const type = formData.type || "CARD";
     // Validación para "PSE"
     if (type === "PSE") {
       return (
@@ -46,18 +62,27 @@ const StepWizard = () => {
     }
 
     // Validación para "card"
-    if (type === "card") {
+    if (type === "CARD") {
       return (
-        formData.cardNumber &&
-        formData.expirationDate &&
-        formData.address &&
-        formData.phone
+        formData.number &&
+        formData.cardHolder &&
+        formData.expMonth &&
+        formData.expYear &&
+        formData.installments &&
+        formData.cvc &&
+        localFormData.address &&
+        localFormData.phone
       );
+
     }
 
     // Validación para "ban" (puedes añadir más campos según sea necesario)
-    if (type === "ban") {
-      return formData.address && formData.phone;
+    if (type === "BANCOLOMBIA_TRANSFER") {
+      return localFormData.address && localFormData.phone;
+    }
+
+    if (type === "NEQUI") {
+      return formData.phoneNumber && localFormData.phone && localFormData.address;
     }
 
     // Agregar validaciones para otros tipos si es necesario
@@ -77,59 +102,76 @@ const StepWizard = () => {
       }
     }
   };
-  const dataPayment = () => {
-    const type = combinedFormData.type || {}; // Obtener el tipo de pago del objeto recibido
-    console.log("Tipo de pago:", type);
 
+  const preparePaymentData = () => {
+    const type = combinedFormData.type || "CARD"; // Obtener el tipo de pago del objeto recibido
+    console.log("Tipo de pago:", type);
+  
+    // Seleccionar la plantilla adecuada según el tipo
     let template = null;
     if (type === "PSE") {
       template = pse;
+    } else if (type === "CARD") {
+      template = card;
+    } else if (type === "BANCOLOMBIA_TRANSFER") {
+      template = ban;
+    } else if (type === "NEQUI") {
+      template = nequi;
+    }  
+    // Crear y actualizar la plantilla con los datos de combinedFormData
+    const updatedFormData = JSON.parse(JSON.stringify(template));
+  
+    if (combinedFormData) {
+      // Campos específicos
+      if (combinedFormData.typeId) {
+        updateNestedField(updatedFormData, "userLegalIdType", combinedFormData.typeId);
+      }
+  
+      if (combinedFormData.identification) {
+        updateNestedField(updatedFormData, "userLegalId", combinedFormData.identification);
+      }
+  
+      const combinedNames = [combinedFormData.name1, combinedFormData.name2].filter(Boolean).join(" ");
+      const combinedLastNames = [combinedFormData.lastName1, combinedFormData.lastName2].filter(Boolean).join(" ");
+  
+      updateNestedField(updatedFormData, "names", combinedNames);
+      updateNestedField(updatedFormData, "lastNames", combinedLastNames);
     }
-    console.log("template", template);
-    setFormDataPayment(() => {
-      const updatedFormData = { ...template }; // Clonar la plantilla
   
-      // Actualizar campos en la plantilla con los datos de `data`
-      if (combinedFormData) {
+    if (!updatedFormData.phoneNumber && combinedFormData.phone) {
+      updateNestedField(updatedFormData, "phoneNumber", combinedFormData.phone);
+    }
   
-        if (combinedFormData.typeId) {
-          updateNestedField(updatedFormData, "userLegalIdType", combinedFormData.typeId);
-        }
+    if (combinedFormData.email) {
+      updatedFormData.email = combinedFormData.email;
+    }
   
-        if (combinedFormData.identification) {
-          updateNestedField(updatedFormData, "userLegalId", combinedFormData.identification);
-        }
-  
-        const combinedNames = [combinedFormData.name1, combinedFormData.name2].filter(Boolean).join(" ");
-        const combinedLastNames = [combinedFormData.lastName1, combinedFormData.lastName2].filter(Boolean).join(" ");
-  
-        updateNestedField(updatedFormData, "names", combinedNames);
-        updateNestedField(updatedFormData, "lastNames", combinedLastNames);
-      }
-  
-      if (combinedFormData.phone) {
-        updateNestedField(updatedFormData, "phoneNumber", combinedFormData.phone);
-      }
-  
-      if (combinedFormData.email) {
-        updatedFormData.email = combinedFormData.email;
-      }
-  
-      // Llenar todos los demás campos genéricos
-      for (const [key, value] of Object.entries(combinedFormData)) {
-        updateNestedField(updatedFormData, key, value);
-      }
-  
-      console.log("updatedFormData", updatedFormData);
-      return updatedFormData;
-    });
-    console.log("formDataPayment", formDataPayment);
-    nextStep();
-
+    // Actualizar todos los demás campos genéricos
+    for (const [key, value] of Object.entries(combinedFormData)) {
+      updateNestedField(updatedFormData, key, value);
+    }  
+    return updatedFormData;
   };
 
+
+ const dataPayment = () => {
+  // Procesar los datos fuera del setFormDataPayment
+  const updatedFormData = preparePaymentData();
+  console.log("updatedFormData", updatedFormData);
+
+  // Usar el resultado procesado para actualizar el estado y despachar acciones
+  setFormDataPayment(updatedFormData);
+  dispatch(setUpdatedFormDataPaid(updatedFormData));
+  setPaidObject(updatedFormData);
+
+  // Proceder al siguiente paso después de un tiempo
+  setTimeout(() => {
+    console.log("paidObject", updatedFormData);
+    nextStep();
+  }, 2000);
+};
+
 const loadPayloadToFormData = (payload) => {
-  console.log('payload', payload);
   setFormDataPayment((prevFormData) => {
     const updatedFormData = { ...prevFormData };
 
@@ -172,40 +214,28 @@ const loadPayloadToFormData = (payload) => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-
-
-  const renderStepContent = (step) => {
-    switch (step) {
-      case 1:
-        return (
-          <StepOne onRegisterData={onRegisterData} modalOpen={modalOpen} status={status} next={next} />
-        );
-      case 2:
-        return (
-          <StepTwo payload={payload}/>
-        );
-      case 3:
-        return (
-          <StepThree />
-        );
-      case 4:
-        return (
-         <p>Paso 4</p>
-        );
-      case 5:
-        return (
-          <p>Paso 5</p>
-
-        );
-      case 6:
-        return (
-          <p>Paso 6</p>
-
-        );
-      default:
-        return null;
-    }
-  };
+  // const renderStepContent = (step) => {
+  //   switch (step) {
+  //     case 1:
+  //       return (
+  //         <StepOne onRegisterData={onRegisterData} modalOpen={modalOpen} status={status} next={next} />
+  //       );
+  //     case 2:
+  //       return (
+  //         <StepTwo payload={payload}/>
+  //       );
+  //     case 3:
+  //       return (
+  //         <StepThree ref={buyProductRef} />
+  //       );
+  //       case 4:
+  //       return (
+  //         <FinallyNequi transactionId={transaction} />
+  //       );
+  //     default:
+  //       return null;
+  //   }
+  // };
   
   const onRegisterData = (data) => {
     setPayload(data);
@@ -214,7 +244,43 @@ const loadPayloadToFormData = (payload) => {
   };
 
   const fetchData = async () => {
-    setStatus(200);
+    console.log('payload', payload);
+
+    // Mostrar el modal con mensaje de "Cargando"
+    setMessage("Cargando...");
+    setIsModalOpen(true);
+
+    try {
+      // Realizar la petición POST con axios para registrar al usuario
+      const response = await axios.post('https://medicallapi-test.azurewebsites.net/api/Patients', payload);
+      console.log('response', response.data);
+      // Verificar si el registro fue exitoso
+      if (response.data.user) {
+        setMessage("Registro exitoso.");
+        setIsSuccess(true);
+        setIsUserRegistered(true)
+      } else if (response.data.error) {
+        setMessage(response.data.error.message);
+        setIsSuccess(false);
+      }
+    } catch (error) {
+      console.error("Error al registrar usuario:", error);
+      setMessage("Hubo un error al registrar el usuario.");
+      setIsSuccess(false);
+    }
+  };
+
+  const registered = () => {
+    setIsUserRegistered(true)
+  }
+
+  // Cerrar el modal y redirigir si es exitoso
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    if (isSuccess) {
+      // Redirigir si el registro es exitoso
+      setCurrentStep(2) // Cambiar la ruta según corresponda
+    }
   };
 
   const modalOpen = (isUserRegistered) => {
@@ -229,65 +295,258 @@ const loadPayloadToFormData = (payload) => {
     }
   };
 
+  const BASE_URL = "https://medicallapi-test.azurewebsites.net/api/Payments";
+  const performPurchase = async ()=> {
+    if (!paidObject) {
+      console.error("No se ha proporcionado ningún objeto de pago.");
+      return;
+    }
+    try {
+      // const type = paidObject.paymentMethod.type;
+      const createTransactionResponse = await axios.post(`${BASE_URL}/PatientPlan`, paidObject,
+        {
+          headers: {
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZFVzZXIiOiIyIiwiTml0RW1wcmVzYSI6IjkwMDAwNTk1NSJ9.BpWh-T-iKMa4WgUAUokCA58mzXLnhvHjJXRdoxKGZT4`,
+          },
+        }
+      );
+  
+      const { success, message, data } = createTransactionResponse.data;
+  
+      if (!success || message !== "Transacción generada exitosamente!.") {
+        throw new Error("Algo ha pasado con la transacción, inténtelo más tarde.");
+      }
+  
+      console.log("Transacción generada exitosamente:", data);
+  
+      // Segunda solicitud: Consultar el estado de la transacción
+      const { transactionId } = data;
+      setTransaction(transactionId);
+
+      const type = paidObject.paymentMethod.type; 
+  
+      if (type === "PSE" || type === "BANCOLOMBIA_TRANSFER") {
+      const asyncPaymentUrl = await checkAsyncPaymentUrl(transactionId);
+  
+        if (asyncPaymentUrl) {
+          // Redirigir a la URL en una nueva pestaña
+          window.open(asyncPaymentUrl, '_blank');
+        } else {
+          console.error("No se pudo obtener una URL válida para el pago.");
+        }
+      } else if (type === "CARD") {
+        // Redireccionar a la página de pago
+        setCurrentStep(4);
+      } else if (type === "NEQUI") {
+        // Redireccionar a la página de pago
+        setCurrentStep(4);
+      }
+
+  
+      return {
+        success: true,
+        transactionData: data,
+      };
+    } catch (error) {
+      console.error("Error en la compra:", error.message);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  };
+const checkAsyncPaymentUrl = async (transactionId) => {
+  const maxAttempts = 100;
+  const delay = 1000;
+  let attempts = 0;
+
+  while (attempts < maxAttempts) {
+    try {
+      // Realiza la solicitud al endpoint
+      const statusResponse = await axios.get(`${BASE_URL}/GetStatusOrder/${transactionId}`);
+      const paymentData = statusResponse.data?.data?.payment_method;
+
+      // Verifica si async_payment_url está disponible
+      if (paymentData?.extra?.async_payment_url) {
+        console.log("URL de pago obtenida:", paymentData.extra.async_payment_url);
+        return paymentData.extra.async_payment_url;
+      }
+
+      console.log(`Intento ${attempts + 1}: URL aún no disponible, reintentando...`);
+    } catch (error) {
+      console.error(`Error al obtener el estado de la transacción en el intento ${attempts + 1}:`, error.message);
+    }
+
+    // Espera antes de volver a intentar
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    attempts += 1;
+  }
+
+  console.error("Se alcanzó el máximo número de intentos sin obtener una URL válida.");
+  return null;
+};
+
+useEffect(() => {
+  // const constainer = document.querySelector(".cont");
+
+  if (currentStep === 1) { 
+    setHeight(30)
+  } else if (currentStep === 2) {
+    setHeight(37)
+  } else if (currentStep === 3) {
+    setHeight(30)
+  } else if (currentStep === 4) {
+    setHeight(26)
+  }
+}, [currentStep]);
+
 
   return (
-    
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-5xl bg-white  shadow-lg rounded-lg p-8">
-      <div className="flex justify-between mt-6">  
-
-          <button
-            onClick={prevStep}
-            disabled={currentStep === 1}
-            className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50"
-          >
-            Anterior
-          </button>
-          {/* <h1 className="text-2xl font-bold text-center text-gray-700">
-         Paso {currentStep}
-        </h1> */}
-                <Stepper currentStep={currentStep} />
-
-
-        {currentStep === 2 ? 
-          <button
-            onClick={dataPayment}
-            disabled={isButtonDisabled}
-            className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50"
-          >
-            Siguiente
-          </button>
-          :
-          <button
-            onClick={fetchData}
-            disabled={disabled}
-            className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50
-            "
-          >
-            Registrarse
-          </button>
-          }
-        </div>
-        
-
-        <div
-          className="transition duration-500 ease-in-out"
-          key={currentStep}
+        <div className="relative w-full max-w-4xl mx-auto bg-white p-6 h-auto shadow-md rounded-md" onChange={() => setIsDirty(true)}  >
+               <Stepper currentStep={currentStep} />
+        {/* Contenedor de los pasos */}
+      
+        <div className="relative overflow-hidden cont" style={{ height: `${height}rem`}}
         >
-  
-                <pre>{JSON.stringify(combinedFormData, null, 2)}</pre>
-
-
-
-          {renderStepContent(currentStep)}
+          {/* Paso 1 */}
+          <br />
+          <div
+            className={`absolute top-0 left-0 w-full transition-all duration-500 transform ${
+              currentStep === 1 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full pointer-events-none"
+            }`}
+          >
+            <StepOne onRegisterData={onRegisterData} modalOpen={modalOpen} next={next} onSuccessfulRegistration={isUserRegistered} registered={registered} />
+          </div>
+          {/* Paso 2 */}
+          <div
+            className={`absolute top-0 left-0 w-full transition-all duration-500 transform ${
+              currentStep === 2 ? "opacity-100 translate-x-0" : "opacity-0 translate-x-full pointer-events-none"
+            }`}
+          >
+            <StepTwo payload={payload}/>
+          </div>
+          {/* Paso 3 */}
+          <div
+            className={`absolute top-0 left-0 w-full transition-all duration-500 transform ${
+              currentStep === 3 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full pointer-events-none"
+            }`}
+          >
+            <StepThree/>
+          </div>
+          {/* Paso 4 */}
+          <div
+            className={`absolute top-0 left-0 w-full transition-all duration-500 transform ${
+              currentStep === 4 ? "opacity-100 translate-x-0" : "opacity-0 translate-x-full pointer-events-none"
+            }`}
+          >
+            {/* <FinallyNequi transactionId={transaction} /> */}
+          </div>
         </div>
 
-        
-        
+      
+          {/* Navegación entre pasos */}
+          <div className="flex justify-between mt-6">
+            <button
+              onClick={prevStep}
+              disabled={currentStep === 1}
+              className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 disabled:bg-gray-200"
+            >
+              Anterior
+            </button>
+            
+            {isUserRegistered && currentStep === 1 ? ( 
+              <button
+                className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50"
+                onClick={nextStep}
+              >
+                Siguiente
+              </button>
+            ) : isUserRegistered && currentStep === 2 ? ( 
+              <button
+                onClick={dataPayment}
+                disabled={isButtonDisabled}
+                className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50"
+              >
+                Siguiente
+              </button>
+               ) : isUserRegistered && currentStep === 3 ? ( 
+              <button
+                onClick={performPurchase}
+                className="w-auto px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-500 focus:outline-none focus:ring-4 focus:ring-green-600 transition-all disabled:opacity-50"
+              >
+                Comprar
+              </button>
+            ) : ( // Si no está registrado y no es el paso 3
+              <button
+                onClick={fetchData}
+                disabled={disabled}
+                className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50"
+              >
+                Registrarse
+              </button>
+            )}
+        </div>
+           <Modal isOpen={modal} message="Ya estás registrado, redirigiendo..." />
+       <ModalNotRegistered 
+         message={message} 
+         isOpen={isModalOpen} 
+         onClose={handleCloseModal} 
+       />
       </div>
-      <Modal isOpen={modal} message="Ya estás registrado, redirigiendo..." />
 
-    </div>
+    // <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    //   <div className="w-full max-w-5xl bg-white  shadow-lg rounded-lg p-8">
+    //   <div className="flex justify-between mt-6">  
+    //       {/* <h1 className="text-2xl font-bold text-center text-gray-700">
+    //      Paso {currentStep}
+    //     </h1> */}
+    //         <Stepper currentStep={currentStep} />
+
+    //         {currentStep === 2 ? (
+    //       <button
+    //         onClick={dataPayment}
+    //         disabled={isButtonDisabled}
+    //         className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50"
+    //       >
+    //         Siguiente
+    //       </button>
+    //     ) : currentStep === 3 ? (
+    //       <button
+    //         onClick={performPurchase}
+    //         className="w-auto px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-500 focus:outline-none focus:ring-4 focus:ring-green-600 transition-all disabled:opacity-50"
+    //       >
+    //         Comprar
+    //       </button>
+    //     ) : (
+    //       <button
+    //         onClick={fetchData}
+    //         disabled={disabled}
+    //         className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50"
+    //       >
+    //         Registrarse
+    //       </button>
+    //     )}
+    //     </div>
+        
+
+    //     <div
+    //       className="transition duration-500 ease-in-out" 
+    //       key={currentStep}
+    //       onChange={() => setIsDirty(true)}
+    //     >
+    //       {renderStepContent(currentStep)}
+    //     </div>
+
+        
+        
+    //   </div>
+    //   <Modal isOpen={modal} message="Ya estás registrado, redirigiendo..." />
+    //   <ModalNotRegistered 
+    //     message={message} 
+    //     isOpen={isModalOpen} 
+    //     onClose={handleCloseModal} 
+    //   />
+    // </div>
   );
 };
 

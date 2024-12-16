@@ -8,13 +8,13 @@ import { setLocalFormData } from "../../store/slices/dataAddSlice";
 
 
 const StepTwo = ({ payload, dataPayment }) => {
+
   const dispatch = useDispatch();
 
   const [localFormData, setLocalFormDataAdd] = useState({
     address: "",
     phone: "",
   });
-
 
   let fullName = '';
   let fullLastName = '';
@@ -51,6 +51,8 @@ const StepTwo = ({ payload, dataPayment }) => {
         ...payload.user, // Mantener los datos previos
         ...data,   // Combinar con los datos del formulario
               };
+              console.log('updatedata32', updatedData);
+
       dispatch(setFormData(updatedData)); // Enviar los datos actualizados al padre
 
     };
@@ -60,7 +62,7 @@ const StepTwo = ({ payload, dataPayment }) => {
     <div className="bg-white rounded-lg p-6 w-full grid grid-cols-1 md:grid-cols-2 gap-6">
     {/* Columna izquierda */}
     <div>
-      <form className="space-y-6">
+      <form className="space-y-6" autoComplete="off">
       <h2 className="text-2xl font-bold text-gray-700 text-center mb-12 mt-6">Datos del comprador</h2>
         {/* Fila 1 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -75,7 +77,7 @@ const StepTwo = ({ payload, dataPayment }) => {
               disabled
               id="typeId"
               name="typeId"
-              value={payload.user.typeId}
+              value={payload.user?.typeId || ""}
               className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200"
             >
               <option value="">Seleccione</option>
@@ -97,7 +99,7 @@ const StepTwo = ({ payload, dataPayment }) => {
               type="text"
               id="identification"
               name="identification"
-              value={payload.user.identification}
+              value={payload.user?.identification || ""}
               className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200 disabled:text-gray-600"
             />
           </div>
@@ -153,7 +155,7 @@ const StepTwo = ({ payload, dataPayment }) => {
             type="email"
             id="email"
             name="email"
-            value={payload.user.email}
+            value={payload.user?.email || ""}
             className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200 disabled:text-gray-600"
           />
         </div>

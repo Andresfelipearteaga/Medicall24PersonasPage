@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import PropTypes from "prop-types";
+// import usePreventUnload from "../../hooks/usePreventUnload";
 
-const StepOne = ({ onRegisterData, modalOpen, next }) => {
+const StepOne = ({ onRegisterData, modalOpen, next, onSuccessfulRegistration, registered }) => {
+    // const [isDirty, setIsDirty] = usePreventUnload();
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [isValid, setIsValid] = useState(false);
+  const [isUserRegistered, setIsUserRegistered] = useState(false);
+
 
   const [typeIds, setTypeIds] = useState([]);
   const [formErrors, setFormErrors] = useState({
@@ -23,8 +27,8 @@ const StepOne = ({ onRegisterData, modalOpen, next }) => {
         email: '',
         password: '',
       },
-      epsId: 0, 
-      regimenId: 0,
+      epsId: null, 
+      regimenId: null,
   });
 
     // Cargar tipos de identificación
@@ -104,14 +108,18 @@ const StepOne = ({ onRegisterData, modalOpen, next }) => {
             }));
 
             console.log("modal", true);
+            setIsUserRegistered(true)
+            registered()
             modalOpen(true);
             } else {
+            setIsUserRegistered(false)
             modalOpen(false);            }
           } catch (error) {
             console.error("Error al verificar el usuario:", error);
           }
         }
       };
+
 
 
    // Pasar datos al componente padre
@@ -121,8 +129,8 @@ const StepOne = ({ onRegisterData, modalOpen, next }) => {
 
 
   useEffect(() => {
-    const { name1, lastName1, email, identification, password } = formData.user;
-    const allFieldsValid = name1 && lastName1 && email && identification && !formErrors.email && !formErrors.identification;
+    const { name1, lastName1, email, identification, password, typeId } = formData.user;
+    const allFieldsValid = name1 && lastName1 && email && identification && typeId && password && !formErrors.email && !formErrors.identification;
     const passwordsMatch = password === confirmPassword && !passwordError;
 
     setIsValid(allFieldsValid && passwordsMatch);
@@ -133,7 +141,9 @@ const StepOne = ({ onRegisterData, modalOpen, next }) => {
     next(isValid);
   }, [isValid, next]);
  
-
+  useEffect(() => {
+    setIsUserRegistered(onSuccessfulRegistration)
+  }, [onSuccessfulRegistration])
 
   // Manejar cambios en los campos para Validar si las contraseñas coinciden
 // Manejar cambios en los campos para Validar si las contraseñas coinciden
@@ -176,7 +186,7 @@ const handleChangePassword = (e) => {
 
   return (
       <div className="bg-white rounded-lg p-6 w-full">
-        <form className="space-y-6">
+        <form className="space-y-6" autoComplete="off">
           {/* Fila 1 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -186,9 +196,10 @@ const handleChangePassword = (e) => {
                 id="typeId"
                 name="typeId"
                 value={formData.user.typeId || ""}
+                disabled={isUserRegistered} 
                 onChange={handleChange}
                 onBlur={checkUserRegistration}
-                className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
+                className="w-full px-4 py-2 border-2 disabled:text-gray-600 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200"
               >
                 <option value="">Seleccione</option>
                 {typeIds.map((type) => (
@@ -207,9 +218,10 @@ const handleChangePassword = (e) => {
                 id="identification"
                 name="identification"
                 value={formData.user.identification || ""}
+                disabled={isUserRegistered} 
                 onChange={handleChange}
                 onBlur={checkUserRegistration}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${formErrors.identification ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'}`}
+                className={`w-full px-4 py-2 disabled:bg-gray-200 disabled:text-gray-600 border-2 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${formErrors.identification ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'}`}
                 />
                 {formErrors.identification && (
                   <p className="text-red-500 text-sm mt-1">{formErrors.identification}</p>
@@ -227,8 +239,9 @@ const handleChangePassword = (e) => {
                 id="name1"
                 name="name1"
                 value={formData.user.name1 || ""}
+                disabled={isUserRegistered} 
                 onChange={handleChange}
-                className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
+                className="w-full px-4 py-2 disabled:bg-gray-200 disabled:text-gray-600 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               />
             </div>
 
@@ -239,8 +252,9 @@ const handleChangePassword = (e) => {
                 id="name2"
                 name="name2"
                 value={formData.user.name2 || ""}
+                disabled={isUserRegistered} 
                 onChange={handleChange}
-                className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
+                className="w-full px-4 py-2 disabled:bg-gray-200 disabled:text-gray-600 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               />
             </div>
 
@@ -252,8 +266,9 @@ const handleChangePassword = (e) => {
                 id="lastName1"
                 name="lastName1"
                 value={formData.user.lastName1 || ""}
+                disabled={isUserRegistered} 
                 onChange={handleChange}
-                className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
+                className="w-full px-4 py-2 disabled:bg-gray-200 disabled:text-gray-600 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               />
             </div>
 
@@ -264,8 +279,9 @@ const handleChangePassword = (e) => {
                 id="lastName2"
                 name="lastName2"
                 value={formData.user.lastName2 || ""}
+                disabled={isUserRegistered} 
                 onChange={handleChange}
-                className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
+                className="w-full px-4 py-2 disabled:bg-gray-200 disabled:text-gray-600 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               />
             </div>
           </div>
@@ -280,8 +296,9 @@ const handleChangePassword = (e) => {
                 id="email"
                 name="email"
                 value={formData.user.email || ""}
+                disabled={isUserRegistered} 
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${formErrors.email ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'}`}
+                className={`w-full px-4 py-2 disabled:bg-gray-200 border-2 disabled:text-gray-600 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${formErrors.email ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'}`}
                 />
                 {formErrors.email && (
                   <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>
@@ -299,8 +316,9 @@ const handleChangePassword = (e) => {
                 id="password"
                 name="password"
                 value={formData.user.password || ""}
+                disabled={isUserRegistered} 
                 onChange={handleChangePassword}
-                className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
+                className="w-full px-4 py-2 border-2 disabled:bg-gray-200 disabled:text-gray-600  rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               />
             </div>
             <div>
@@ -312,7 +330,8 @@ const handleChangePassword = (e) => {
                 name="confirmPassword"
                 value={confirmPassword}
                 onChange={handleChangePassword}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${
+                disabled={isUserRegistered} 
+                className={`w-full px-4 py-2 border-2 disabled:bg-gray-200 disabled:text-gray-400  disabled:text-gray-600 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${
                     passwordError ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'
                   }`}
               />

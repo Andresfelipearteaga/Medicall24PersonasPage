@@ -8,7 +8,7 @@
     "phone": "string",
     "productId": 15,
     "paymentMethod": {
-      "type": "string",
+      "type": "CARD",
       "installments": 0,
       "card": {
         "number": "string",
