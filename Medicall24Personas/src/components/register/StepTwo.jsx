@@ -51,7 +51,8 @@ const StepTwo = ({ payload, dataPayment }) => {
         ...payload.user, // Mantener los datos previos
         ...data,   // Combinar con los datos del formulario
               };
-              console.log('updatedata32', updatedData);
+              console.log('data', data);
+        console.log('updatedata32', updatedData);
 
       dispatch(setFormData(updatedData)); // Enviar los datos actualizados al padre
 

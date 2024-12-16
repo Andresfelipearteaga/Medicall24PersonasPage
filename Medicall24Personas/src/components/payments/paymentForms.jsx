@@ -43,11 +43,10 @@ const onMethodChange = (method) => {
         expMonth: "",
         expYear: "",
         cardHolder: "",
-  
       installments: "0",
       phoneNumber: "",
       userType: "",
-      financialInstitutionCode: "",
+      financialInstitutionCode: "0",
     }),
     ...(method === "BANCOLOMBIA_TRANSFER" && {
       financialInstitutionCode: "0",
@@ -56,7 +55,6 @@ const onMethodChange = (method) => {
         cvc: "",
         expMonth: "",
         expYear: "",
-        cardHolder: "",
       installments: "0",
       phoneNumber: "",
     }),

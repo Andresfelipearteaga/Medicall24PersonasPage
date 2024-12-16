@@ -104,6 +104,7 @@ const StepWizard = () => {
   };
 
   const preparePaymentData = () => {
+    console.log('combinedformdata', combinedFormData);
     const type = combinedFormData.type || "CARD"; // Obtener el tipo de pago del objeto recibido
     console.log("Tipo de pago:", type);
   
