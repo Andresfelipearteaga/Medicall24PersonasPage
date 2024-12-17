@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import PropTypes from "prop-types";
+import visibilityOff from "../../assets/SVG/visibility_off.svg";
+import visibility from "../../assets/SVG/visibility.svg";
 // import usePreventUnload from "../../hooks/usePreventUnload";
 
 const StepOne = ({ onRegisterData, modalOpen, next, onSuccessfulRegistration, registered }) => {
@@ -11,7 +13,7 @@ const StepOne = ({ onRegisterData, modalOpen, next, onSuccessfulRegistration, re
   const [isValid, setIsValid] = useState(false);
   const [isUserRegistered, setIsUserRegistered] = useState(false);
 
-
+  const [showPassword, setShowPassword] = useState(false);
   const [typeIds, setTypeIds] = useState([]);
   const [formErrors, setFormErrors] = useState({
     identification: '',
@@ -44,6 +46,11 @@ const StepOne = ({ onRegisterData, modalOpen, next, onSuccessfulRegistration, re
         };
         fetchTypeIds();
       }, []);
+
+
+      const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+      };
 
       // Validar identificación
     const validateIdentification = (value) => {
@@ -310,9 +317,10 @@ const handleChangePassword = (e) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-gray-700 font-medium mb-1" htmlFor="name2"><span className="text-red-600">*</span> Contraseña</label>
+              <div className="flex items-center space-x-2">
               <input
                 required
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
                 value={formData.user.password || ""}
@@ -320,6 +328,14 @@ const handleChangePassword = (e) => {
                 onChange={handleChangePassword}
                 className="w-full px-4 py-2 border-2 disabled:bg-gray-200 disabled:text-gray-600  rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               />
+              <button type="button" onClick={togglePasswordVisibility} className="text-gray-600 hover:text-gray-800 focus:outline-none">
+                {showPassword ? (
+                  <img src={visibility} alt="show password" className="w-5 h-5" />
+                ) : (
+                  <img src={visibilityOff} alt="hide password" className="w-5 h-5" />
+                )}
+              </button>
+              </div>
             </div>
             <div>
               <label className="block text-gray-700 font-medium mb-1" htmlFor="lastName1"><span className="text-red-600">*</span> Confirmar Contraseña</label>

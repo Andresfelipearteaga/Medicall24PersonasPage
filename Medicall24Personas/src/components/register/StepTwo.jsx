@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 // import axios from "axios";
 import PropTypes from "prop-types";
 import PaymentForm from "../payments/paymentForms";
@@ -14,7 +14,24 @@ const StepTwo = ({ payload, dataPayment }) => {
   const [localFormData, setLocalFormDataAdd] = useState({
     address: "",
     phone: "",
+    email: "",
   });
+
+    // Sincronizar el estado local con `payload.user` solo cuando cambia
+    useEffect(() => {
+      if (payload.user) {
+        const { email, address, phone } = payload.user;
+        setLocalFormDataAdd((prevData) => ({
+          ...prevData,
+          email: email || "",
+          address: address || "",
+          phone: phone || "",
+        }));
+      }
+    }, [payload.user]);
+
+
+  console.log('payload 1', payload);
 
   let fullName = '';
   let fullLastName = '';
@@ -32,13 +49,15 @@ const StepTwo = ({ payload, dataPayment }) => {
     // Manejar cambios en los campos address y phone
     const handleChange = (e) => {
       const { name, value } = e.target;
-    
+        console.log('name', name);
+      console.log('value', value);
       // Actualizar localFormData para los campos address y phone
       setLocalFormDataAdd((prevData) => {
         const updatedData = {
           ...prevData,
           [name]: value,
         };
+        console.log('updatedData two', updatedData);
         dispatch(setLocalFormData(updatedData));
         return updatedData;
 
@@ -72,7 +91,7 @@ const StepTwo = ({ payload, dataPayment }) => {
               className="block text-gray-700 font-medium mb-1"
               htmlFor="typeId"
             >
-              <span className="text-red-600">*</span> Tipo de Identificación
+          Tipo de Identificación
             </label>
             <select
               disabled
@@ -93,7 +112,7 @@ const StepTwo = ({ payload, dataPayment }) => {
               className="block text-gray-700 font-medium mb-1"
               htmlFor="identification"
             >
-             <span className="text-red-600">*</span> Identificación
+           Identificación
             </label>
             <input
               disabled
@@ -149,16 +168,17 @@ const StepTwo = ({ payload, dataPayment }) => {
             className="block text-gray-700 font-medium mb-1"
             htmlFor="email"
           >
-            Correo Electrónico
+           <span className="text-red-600">*</span> Correo Electrónico
           </label>
           <input
-            disabled
             type="email"
             id="email"
             name="email"
-            value={payload.user?.email || ""}
+            onChange={handleChange}
+            value={localFormData.email}
             className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200 disabled:text-gray-600"
           />
+          <p className="text-xs text-gray-700">A este correo electrónico se le enviará la información de tu compra.</p>
         </div>
   
         {/* Fila 4 */}
@@ -168,13 +188,14 @@ const StepTwo = ({ payload, dataPayment }) => {
               className="block text-gray-700 font-medium mb-1"
               htmlFor="address"
             >
-              Dirección
+              <span className="text-red-600">*</span>  Dirección
             </label>
             <input
               required
               type="text"
               id="address"
               name="address"
+              placeholder="Ingresa tu dirección"
               value={localFormData.address}
               onChange={handleChange}
               className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
@@ -186,11 +207,12 @@ const StepTwo = ({ payload, dataPayment }) => {
               className="block text-gray-700 font-medium mb-1"
               htmlFor="phone"
             >
-              Teléfono
+              <span className="text-red-600">*</span>  Teléfono
             </label>
             <input
               required
               type="text"
+              placeholder="Número de teléfono"
               id="phone"
               name="phone"
               value={localFormData.phone}

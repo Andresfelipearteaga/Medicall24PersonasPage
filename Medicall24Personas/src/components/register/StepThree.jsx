@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const StepThree = ( ) => {
+const StepThree = ({ paymentMethod }) => {
   const [detailPayment, setDetailPayment] = useState({});
-
+  console.log('paymentMethod', paymentMethod);
   const getDetailPayment = async () => {
     const productId = 15;
-    const paymentMethod = "CARD";
 
     if (productId && paymentMethod) {
       try {

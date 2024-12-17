@@ -78,7 +78,7 @@ const PaymentStatus = ({ transactionId }) => {
         <div className="mt-6 text-center">
           <button 
             onClick={() => window.location.href = '/'} 
-            className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors duration-300"
+            className="px-6 py-3 bg-pink-600 text-white font-semibold rounded-lg shadow-md hover:bg-pink-700 transition-colors duration-300"
           >
             Volver al Inicio
           </button>

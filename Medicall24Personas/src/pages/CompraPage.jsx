@@ -1,10 +1,12 @@
 import StepOne from "../components/register/StepOne";
 import StepTwo from "../components/register/StepTwo";
-import StepThree from "../components/register/StepThree";
+// import StepThree from "../components/register/StepThree";
 import Stepper from "../components/register/Stepper";
 import Modal from "../components/modals/isRegistered";
 import ModalNotRegistered from "../components/modals/isNotRegistered";
-import FinallyNequi from "../components/finally/finallyNequi";
+import ModalTerms from "../components/modals/Term&Cond";
+import ModalConfirm from "../components/modals/ConfirmData";
+// import Finally from "../components/finally/FinallyVoucher";
 import pse from "../json/formPse.json";
 import nequi from "../json/formNequi.json";
 import card from "../json/formCard.json";
@@ -16,7 +18,7 @@ import usePreventUnload from "../hooks/usePreventUnload";
 
 
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import axios from "axios";
 
 const StepWizard = () => {
@@ -25,17 +27,21 @@ const StepWizard = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [payload, setPayload] = useState({});
   const [modal, setModal] = useState(false);
+  const [isModalOpenTerm, setIsModalOpenTerm] = useState(false);
+  const [isModalOpenConfirm, setIsModalOpenConfirm] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [formDataPayment, setFormDataPayment] = useState({});
   const [transaction, setTransaction] = useState(null);
   const [paidObject, setPaidObject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [height, setHeight] = useState(0);
   const [isUserRegistered, setIsUserRegistered] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("");
 
-
+  const StepThree = lazy(() => import("../components/register/StepThree"));
+  const Finally = lazy(() => import("../components/finally/FinallyVoucher"));
   const formData = useSelector((state) => state.formData.formData);
   const localFormData = useSelector((state) => state.localFormData);
 
@@ -164,6 +170,7 @@ const StepWizard = () => {
   setFormDataPayment(updatedFormData);
   dispatch(setUpdatedFormDataPaid(updatedFormData));
   setPaidObject(updatedFormData);
+  setPaymentMethod(updatedFormData.paymentMethod.type);
 
   // Proceder al siguiente paso después de un tiempo
   setTimeout(() => {
@@ -241,14 +248,15 @@ const loadPayloadToFormData = (payload) => {
   const onRegisterData = (data) => {
     setPayload(data);
     loadPayloadToFormData(data);
-    // console.log('payload', payload);
+    console.log('payload', payload);
   };
 
   const fetchData = async () => {
     console.log('payload', payload);
 
+    handleCloseModalConfirm();
     // Mostrar el modal con mensaje de "Cargando"
-    setMessage("Cargando...");
+    setStatus("load");
     setIsModalOpen(true);
 
     try {
@@ -257,16 +265,16 @@ const loadPayloadToFormData = (payload) => {
       console.log('response', response.data);
       // Verificar si el registro fue exitoso
       if (response.data.user) {
-        setMessage("Registro exitoso.");
+        setStatus("success");
         setIsSuccess(true);
         setIsUserRegistered(true)
       } else if (response.data.error) {
-        setMessage(response.data.error.message);
+        setStatus("error");
         setIsSuccess(false);
       }
     } catch (error) {
       console.error("Error al registrar usuario:", error);
-      setMessage("Hubo un error al registrar el usuario.");
+      setStatus("error");
       setIsSuccess(false);
     }
   };
@@ -287,13 +295,14 @@ const loadPayloadToFormData = (payload) => {
   const modalOpen = (isUserRegistered) => {
     if (isUserRegistered) {
       setModal(true);
-      setTimeout(() => {
-        setCurrentStep(2);
-        setModal(false);
-      }, 2000);
     } else {
       setModal(false);
     }
+  };
+
+  const handleNextStep = () => {
+    setCurrentStep(2);
+    setModal(false);
   };
 
   const BASE_URL = "https://medicallapi-test.azurewebsites.net/api/Payments";
@@ -397,9 +406,18 @@ useEffect(() => {
   } else if (currentStep === 3) {
     setHeight(30)
   } else if (currentStep === 4) {
-    setHeight(26)
+    setHeight(46)
   }
 }, [currentStep]);
+
+
+  const OpenTerm = () => setIsModalOpenTerm(true);
+  const handleCloseModalTerm = () => setIsModalOpenTerm(false);
+
+  const handleNextToConfirm = () => {
+    handleCloseModalTerm();
+    setIsModalOpenConfirm(true)};
+  const handleCloseModalConfirm = () => setIsModalOpenConfirm(false);
 
 
   return (
@@ -432,7 +450,10 @@ useEffect(() => {
               currentStep === 3 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full pointer-events-none"
             }`}
           >
-            <StepThree/>
+                <Suspense fallback={<div>Cargando...</div>}>
+                  <StepThree paymentMethod={paymentMethod}/>
+                </Suspense>
+            {/* <StepThree paymentMethod={paymentMethod}/> */}
           </div>
           {/* Paso 4 */}
           <div
@@ -440,13 +461,21 @@ useEffect(() => {
               currentStep === 4 ? "opacity-100 translate-x-0" : "opacity-0 translate-x-full pointer-events-none"
             }`}
           >
-            {/* <FinallyNequi transactionId={transaction} /> */}
+              {currentStep === 4 && (
+
+            <Suspense fallback={<div>Cargando...</div>}>
+            <Finally transactionId={transaction} />
+            </Suspense>
+              )}
           </div>
         </div>
 
       
           {/* Navegación entre pasos */}
+         
+ 
           <div className="flex justify-between mt-6">
+          {currentStep != 4 && (
             <button
               onClick={prevStep}
               disabled={currentStep === 1}
@@ -454,7 +483,8 @@ useEffect(() => {
             >
               Anterior
             </button>
-            
+          )}
+
             {isUserRegistered && currentStep === 1 ? ( 
               <button
                 className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50"
@@ -477,9 +507,9 @@ useEffect(() => {
               >
                 Comprar
               </button>
-            ) : ( // Si no está registrado y no es el paso 3
+            ) : currentStep != 4 && ( // Si no está registrado y no es el paso 3
               <button
-                onClick={fetchData}
+                onClick={OpenTerm}
                 disabled={disabled}
                 className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50"
               >
@@ -487,12 +517,14 @@ useEffect(() => {
               </button>
             )}
         </div>
-           <Modal isOpen={modal} message="Ya estás registrado, redirigiendo..." />
-       <ModalNotRegistered 
-         message={message} 
-         isOpen={isModalOpen} 
-         onClose={handleCloseModal} 
-       />
+            <ModalConfirm isOpenConfirm={isModalOpenConfirm} onCloseConfirm={handleCloseModalConfirm} payload={payload} registrar={fetchData} />
+            <ModalTerms isOpenTerm={isModalOpenTerm} onCloseTerm={handleCloseModalTerm} NextToConfirm={handleNextToConfirm} />
+            <Modal isOpen={modal} handleNext={handleNextStep} />
+            <ModalNotRegistered 
+              status={status} 
+              isOpen={isModalOpen} 
+              onClose={handleCloseModal} 
+            />
       </div>
 
     // <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
