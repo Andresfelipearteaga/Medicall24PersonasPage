@@ -3,11 +3,12 @@ import axios from "axios";
 
 const StepThree = ({ paymentMethod }) => {
   const [detailPayment, setDetailPayment] = useState({});
-  console.log('paymentMethod', paymentMethod);
   const getDetailPayment = async () => {
     const productId = 15;
 
     if (productId && paymentMethod) {
+        console.log('paymentMethod', paymentMethod);
+        console.log('productId', productId);
       try {
         const response = await axios.post(
           "https://medicallapi-test.azurewebsites.net/api/Payments/GetDetailPayment",

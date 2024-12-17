@@ -1,4 +1,29 @@
-.con {  
-    height: `${height}rem`
-}
-
+/* Archivo styles.css */
+.step-1, .step-3 {
+    height: 30rem;
+  }
+  
+  .step-2 {
+    height: 37rem;
+  }
+  
+  .step-4 {
+    height: 46rem;
+  }
+  
+  @media (max-width: 768px) {
+    .step-1{
+      height: 60rem; 
+    }
+  
+    .step-2 {
+      height: 95rem;
+    }
+    .step-3 {
+    height: 35rem;
+        }
+    .step-4 {
+      height: 92rem;
+    }
+  }
+  

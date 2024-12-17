@@ -1,11 +1,12 @@
 import StepOne from "../components/register/StepOne";
 import StepTwo from "../components/register/StepTwo";
-// import StepThree from "../components/register/StepThree";
+import StepThree from "../components/register/StepThree";
 import Stepper from "../components/register/Stepper";
 import Modal from "../components/modals/isRegistered";
 import ModalNotRegistered from "../components/modals/isNotRegistered";
 import ModalTerms from "../components/modals/Term&Cond";
 import ModalConfirm from "../components/modals/ConfirmData";
+import "../styles/heightDinamic.css";
 // import Finally from "../components/finally/FinallyVoucher";
 import pse from "../json/formPse.json";
 import nequi from "../json/formNequi.json";
@@ -36,11 +37,10 @@ const StepWizard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [status, setStatus] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
-  const [height, setHeight] = useState(0);
+  const [stepClass, setStepClass] = useState('');
   const [isUserRegistered, setIsUserRegistered] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("");
 
-  const StepThree = lazy(() => import("../components/register/StepThree"));
   const Finally = lazy(() => import("../components/finally/FinallyVoucher"));
   const formData = useSelector((state) => state.formData.formData);
   const localFormData = useSelector((state) => state.localFormData);
@@ -397,19 +397,11 @@ const checkAsyncPaymentUrl = async (transactionId) => {
 };
 
 useEffect(() => {
-  // const constainer = document.querySelector(".cont");
-
-  if (currentStep === 1) { 
-    setHeight(30)
-  } else if (currentStep === 2) {
-    setHeight(37)
-  } else if (currentStep === 3) {
-    setHeight(30)
-  } else if (currentStep === 4) {
-    setHeight(46)
-  }
+  if (currentStep === 1) setStepClass('step-1');
+  else if (currentStep === 2) setStepClass('step-2');
+  else if (currentStep === 3) setStepClass('step-3');
+  else if (currentStep === 4) setStepClass('step-4');
 }, [currentStep]);
-
 
   const OpenTerm = () => setIsModalOpenTerm(true);
   const handleCloseModalTerm = () => setIsModalOpenTerm(false);
@@ -425,8 +417,7 @@ useEffect(() => {
                <Stepper currentStep={currentStep} />
         {/* Contenedor de los pasos */}
       
-        <div className="relative overflow-hidden cont" style={{ height: `${height}rem`}}
-        >
+        <div className={`${stepClass} relative overflow-hidden`}>
           {/* Paso 1 */}
           <br />
           <div
@@ -450,9 +441,10 @@ useEffect(() => {
               currentStep === 3 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full pointer-events-none"
             }`}
           >
-                <Suspense fallback={<div>Cargando...</div>}>
+            {currentStep === 3 && (
                   <StepThree paymentMethod={paymentMethod}/>
-                </Suspense>
+            )}
+    
             {/* <StepThree paymentMethod={paymentMethod}/> */}
           </div>
           {/* Paso 4 */}
