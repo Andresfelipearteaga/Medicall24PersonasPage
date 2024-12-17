@@ -6,6 +6,7 @@ import Modal from "../components/modals/isRegistered";
 import ModalNotRegistered from "../components/modals/isNotRegistered";
 import ModalTerms from "../components/modals/Term&Cond";
 import ModalConfirm from "../components/modals/ConfirmData";
+import Loader from "../components/modals/Loader";
 import "../styles/heightDinamic.css";
 // import Finally from "../components/finally/FinallyVoucher";
 import pse from "../json/formPse.json";
@@ -40,6 +41,7 @@ const StepWizard = () => {
   const [stepClass, setStepClass] = useState('');
   const [isUserRegistered, setIsUserRegistered] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const Finally = lazy(() => import("../components/finally/FinallyVoucher"));
   const formData = useSelector((state) => state.formData.formData);
@@ -162,6 +164,10 @@ const StepWizard = () => {
 
 
  const dataPayment = () => {
+  setLoading(true);
+  setTimeout(() => {
+    setLoading(false);
+  }, 3000);
   // Procesar los datos fuera del setFormDataPayment
   const updatedFormData = preparePaymentData();
   console.log("updatedFormData", updatedFormData);
@@ -311,6 +317,10 @@ const loadPayloadToFormData = (payload) => {
       console.error("No se ha proporcionado ningún objeto de pago.");
       return;
     }
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
     try {
       // const type = paidObject.paymentMethod.type;
       const createTransactionResponse = await axios.post(`${BASE_URL}/PatientPlan`, paidObject,
@@ -341,6 +351,8 @@ const loadPayloadToFormData = (payload) => {
         if (asyncPaymentUrl) {
           // Redirigir a la URL en una nueva pestaña
           window.open(asyncPaymentUrl, '_blank');
+          setCurrentStep(4);
+
         } else {
           console.error("No se pudo obtener una URL válida para el pago.");
         }
@@ -490,14 +502,14 @@ useEffect(() => {
                 disabled={isButtonDisabled}
                 className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50"
               >
-                Siguiente
+              {loading ? <Loader /> : "Siguiente"}
               </button>
                ) : isUserRegistered && currentStep === 3 ? ( 
               <button
                 onClick={performPurchase}
                 className="w-auto px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-500 focus:outline-none focus:ring-4 focus:ring-green-600 transition-all disabled:opacity-50"
               >
-                Comprar
+                {loading ? <Loader /> : "Comprar"}
               </button>
             ) : currentStep != 4 && ( // Si no está registrado y no es el paso 3
               <button
