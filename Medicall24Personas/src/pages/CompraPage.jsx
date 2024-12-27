@@ -449,6 +449,7 @@ useEffect(() => {
 
         <Header />
         <div className="mt-4 relative w-full max-w-5xl mx-auto bg-white p-6 h-auto shadow-md rounded-md" onChange={() => setIsDirty(true)}  >
+               <p className="text-center text-4xl text-gray-600 mb-4">Registro de usuario en MEDICALL24</p>
                <Stepper currentStep={currentStep} />
         {/* Contenedor de los pasos */}
       

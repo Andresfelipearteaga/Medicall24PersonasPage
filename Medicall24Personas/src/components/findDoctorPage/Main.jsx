@@ -9,18 +9,28 @@ import TermCondBexa from "./TermCondBexa";
 import TermCondBexaNext from "./TermCondBexaNext";
 
 
-const MainContent = () => {
+const MainContent = ( ) => {
     const [promoCode, setPromoCode] = useState("");
     const [discount, setDiscount] = useState(0);
     const packageValue = 249500;
     const [isOpenModalTerm, setIsOpenModalTerm] = useState(false);
     const [isOpenModalTermNext, setIsOpenModalTermNext] = useState(false);
 
-    const handleOpenModalTerm = () => setIsOpenModalTerm(true);
-    const handleCloseModalTerm = () => setIsOpenModalTerm(false); 
+    const handleOpenModalTerm = () => {
+      setIsOpenModalTerm(true)
+    };
+    const handleCloseModalTerm = () => {
+      setIsOpenModalTerm(false)
+    }; 
 
-    const handleOpenModalTermNext = () => setIsOpenModalTermNext(true);
-    const handleCloseModalTermNext = () => setIsOpenModalTermNext(false);
+    const handleOpenModalTermNext = () => {
+      setIsOpenModalTermNext(true)
+    };
+    const handleCloseModalTermNext = () => {
+      setIsOpenModalTermNext(false)
+      
+    }; 
+
 
      // Lista de códigos promocionales con sus respectivos descuentos
     const promoCodes = {
@@ -46,7 +56,7 @@ const MainContent = () => {
     
 
     return (
-      <main className={`{ ${isOpenModalTerm ? 'overflow-hidden mx-auto space-y-6' : 'mx-auto space-y-6'} }`}>
+      <main className="mx-auto space-y-6">
         {/* Section 1: Text Left, Image Right */}
         
         <section className="grid grid-cols-2 md:grid-cols-1 gap-8 items-center px-24 md:px-8 py-16 h-[600px] md:h-auto bexa">
