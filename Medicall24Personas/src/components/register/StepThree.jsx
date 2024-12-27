@@ -4,7 +4,7 @@ import axios from "axios";
 const StepThree = ({ paymentMethod }) => {
   const [detailPayment, setDetailPayment] = useState({});
   const getDetailPayment = async () => {
-    const productId = 15;
+    const productId = 16;
 
     if (productId && paymentMethod) {
         console.log('paymentMethod', paymentMethod);
@@ -26,6 +26,11 @@ const StepThree = ({ paymentMethod }) => {
     getDetailPayment();
   }, []);
 
+
+    // Formateador de números con separadores de miles
+    const formatNumber = (number) =>
+      new Intl.NumberFormat("es-US").format(number || 0);
+  
   return (
     <div className="max-w-md mx-auto mt-12 bg-white p-6 border-x border-gray-300">
       {/* Título principal */}
@@ -48,8 +53,8 @@ const StepThree = ({ paymentMethod }) => {
       {/* Subtotal */}
       <div className="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg mb-2 hover:bg-gray-100 transition">
         <span className="text-gray-700 font-medium">Subtotal</span>
-        <span className="text-gray-600">{detailPayment.subtotal || "---"}</span>
-      </div>
+        {detailPayment.subtotal ? formatNumber(detailPayment.subtotal) : "---"}
+        </div>
 
       {/* IVA */}
       <div className="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg mb-2 hover:bg-gray-100 transition">
@@ -60,14 +65,15 @@ const StepThree = ({ paymentMethod }) => {
       {/* Comisión */}
       <div className="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg mb-2 hover:bg-gray-100 transition">
         <span className="text-gray-700 font-medium">Comisión</span>
-        <span className="text-gray-600">{detailPayment.commission || "---"}</span>
-      </div>
+        {detailPayment.commission
+            ? formatNumber(detailPayment.commission)
+            : "---"}      </div>
 
       {/* Total */}
       <div className="flex justify-between items-center py-3 px-4 bg-green-50 rounded-lg mt-4 border border-green-200 hover:bg-green-100 transition">
         <span className="text-green-700 font-semibold text-lg">Total</span>
         <span className="text-green-700 font-bold text-lg">
-          {detailPayment.total || "---"}
+        {detailPayment.total ? formatNumber(detailPayment.total) : "---"}
         </span>
       </div>
     </div>

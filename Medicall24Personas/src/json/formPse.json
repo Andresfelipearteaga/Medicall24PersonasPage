@@ -6,7 +6,7 @@
     "email": "user@example.com",
     "address": "string",
     "phone": "string",
-    "productId": 15,
+    "productId": 16,
     "paymentMethod": {
       "type": "string",
       "installments": 0,

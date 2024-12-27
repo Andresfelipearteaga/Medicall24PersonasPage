@@ -4,11 +4,22 @@
   }
   
   .step-2 {
-    height: 37rem;
+    height: 40rem;
   }
   
   .step-4 {
     height: 46rem;
+  }
+
+  @media (max-width: 1024px) {
+  
+    .step-2 {
+      height: 105rem;
+    }
+
+    .step-4 {
+      height: 60rem;
+    }
   }
   
   @media (max-width: 768px) {
@@ -17,7 +28,7 @@
     }
   
     .step-2 {
-      height: 95rem;
+      height: 115rem;
     }
     .step-3 {
     height: 35rem;

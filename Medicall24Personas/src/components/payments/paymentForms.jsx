@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import card from "../../assets/SVG/card.svg";
 import pse from "../../assets/SVG/pse.svg";
 import ban from "../../assets/SVG/Ban.svg";
-import nequi from "../../assets/SVG/nequi.svg";
+import visa from "../../assets/SVG/visa.svg";
+import mastercard from "../../assets/SVG/mastercard.svg";
+// import nequi from "../../assets/SVG/nequi.svg";
 import axios from "axios";
 
 
@@ -102,21 +104,84 @@ const onMethodChange = (method) => {
     loadBankPse();
   }, []);
 
+  const methods = [
+    {
+      id: "CARD",
+      // icon: <CreditCard className="w-12 h-12 text-pink-500" />,
+      label: "Tarjeta de crédito\no débito",
+      activeColor: "border-2 border-white shadow-lg bg-white",
+      textColor: "text-gray-600"
+    },
+    {
+      id: "PSE",
+      // icon: <Landmark className="w-12 h-12 text-blue-500" />,
+      label: "PSE",
+      activeColor: "border-2 border-white shadow-lg bg-white",
+      textColor: "text-gray-600"
+    },
+    {
+      id: "BANCOLOMBIA_TRANSFER",
+      // icon: <BanknotesIcon className="w-12 h-12 text-yellow-500" />,
+      label: "Bancolombia",
+      activeColor: "border-2 border-white shadow-lg bg-white",
+      textColor: "text-gray-600"
+    }
+  ];
+
   return (
-    <div className="max-w-lg mx-auto flex flex-col">
-      <h2 className="text-2xl font-bold text-gray-700 text-center mb-6 mt-6">
+    <div className="w-full mx-auto flex flex-col">
+      <h2 className={`text-2xl font-bold text-gray-700 text-center mb-6 ${selectedMethod === 'CARD' ? 'mt-6': 'mt-0' }`}>
         Selecciona un Método de Pago
       </h2>
+      <div className="flex justify-around w-full mb-8">
+      {methods.map((method) => (
+        <button
+          key={method.id}
+          onClick={() => onMethodChange(method.id)}
+          className={`
+            flex flex-col items-center justify-center 
+            w-full max-w-[140px] p-2 rounded-xl 
+            transition-all duration-300 ease-in-out
+            border-2 hover:shadow-lg
+            ${selectedMethod === method.id 
+              ? `${method.activeColor} border-opacity-100` 
+              : 'border-gray-200 border-opacity-50 bg-gray-50'}
+            group
+          `}
+        >
+          <div className="mb-2 opacity-100 group-hover:opacity-100 transition-opacity">
+            <div className="flex items-center justify-center">
+            {method.id === "CARD" && <img src={visa} alt="card" className="w-10 h-10" />}
+            {method.id === "CARD" && <img src={mastercard} alt="card" className="w-10 h-10" />}
+            </div>
+            {method.id === "PSE" && <img src={pse} alt="card" className="w-10 h-10" />}
+            {method.id === "BANCOLOMBIA_TRANSFER" && <img src={ban} alt="card" className="w-10 h-10" />}
+          </div>
+          <span className={`
+            text-center font-semibold text-sm
+            ${selectedMethod === method.id 
+              ? method.textColor 
+              : 'text-gray-600'}
+            group-hover:text-opacity-100
+          `}>
+            {method.label}
+          </span>
+        </button>
+      ))}
+    </div>
 
-      <div className="flex justify-around mb-4">
+{/* 
+      <div className="flex justify-around w-full mb-4 space-x-4">
         <button
           onClick={() => onMethodChange("CARD")}
-          className={`flex flex-col items-center justify-center w-18 h-18 px-4 rounded-lg ${
-            selectedMethod === "CARD" ? "border-pink-600 bg-pink-100" : "border-gray-300"
-          }`}
+          className={`flex flex-col items-center justify-center w-full max-w-[120px] p-4 rounded-xl transition-all duration-300 ease-in-out border-2 hover:shadow-lg ${
+            selectedMethod === "CARD" ? "border-pink-600 bg-gray-100 text-pink-600 border-opacity-100" : "border-gray-200 border-opacity-50 bg-white"
+          }group`}
         >
-          <img src={card} alt="card" className="w-10 h-10" />
-          <span className="text-pink-600 font-medium">Tarjeta</span>
+          <div className="mb-2 opacity-50 group-hover:opacity-100 transition-opacity">
+          <img src={visa} alt="card" className="w-10 h-10" />
+          <img src={mastercard} alt="card" className="w-10 h-10" /></div>
+          <span className="text-gray-600 font-medium">Tarjeta de crédito <br /> o débito</span>
         </button>
         <button
           onClick={() => onMethodChange("PSE")}
@@ -137,8 +202,8 @@ const onMethodChange = (method) => {
         >
           <img src={ban} alt="ban" className="w-10 h-10" />
           <span className="text-yellow-600 font-medium">Bancolombia</span>
-        </button>
-        <button
+        </button> */}
+        {/* <button
           onClick={() => onMethodChange("NEQUI")}
           className={`flex flex-col items-center justify-center w-18 h-18 px-4 rounded-lg ${
             selectedMethod === "NEQUI" ? "border-fuchsia-600 bg-fuchsia-100" : "border-gray-300"
@@ -146,8 +211,8 @@ const onMethodChange = (method) => {
         >
           <img src={nequi} alt="nequi" className="w-10 h-10" />
           <span className="text-fuchsia-600 font-medium">Nequi</span>
-        </button>
-      </div>
+        </button> */}
+      {/* </div> */}
 
       <div className="flex-grow p-4 rounded-lg overflow-y-auto" style={{ minHeight: "250px" }}>
         {selectedMethod === "CARD" && (

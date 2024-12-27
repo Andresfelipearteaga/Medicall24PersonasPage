@@ -217,14 +217,14 @@ const TermsModal = ({ isOpenTerm, onCloseTerm, NextToConfirm }) => {
             <div className="px-6 py-4 flex justify-end space-x-4 bg-gray-100 rounded-b-lg">
               <button
                 onClick={onCloseTerm}
-                className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300"
+                className="px-4 py-2 text-white bg-pink-600 rounded-lg hover:bg-pink-700 transition-all"
               >
                 Cancelar
               </button>
               <button
                 disabled={!accept}
                 onClick={NextToConfirm}
-                className="px-4 py-2 text-white bg-orange-600 rounded-lg hover:bg-orange-700 disabled:bg-gray-300 disabled:text-gray-700"
+                className="px-4 py-2 text-white bg-pink-600 rounded-lg hover:bg-pink-700 disabled:bg-gray-300 disabled:text-gray-700 transition-all"
               >
                 Aceptar
               </button>

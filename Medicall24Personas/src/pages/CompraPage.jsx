@@ -13,9 +13,12 @@ import pse from "../json/formPse.json";
 import nequi from "../json/formNequi.json";
 import card from "../json/formCard.json";
 import ban from "../json/formBancolombia.json";
+import Header from "../components/findDoctorPage/Header";
+import Footer from "../components/findDoctorPage/Footer";
 import { useSelector, useDispatch } from "react-redux";
 import { setUpdatedFormDataPaid } from "../store/slices/paidObject";
 import usePreventUnload from "../hooks/usePreventUnload";
+import ModalPayment from "../components/modals/ModalPayment";
 
 
 
@@ -42,6 +45,8 @@ const StepWizard = () => {
   const [isUserRegistered, setIsUserRegistered] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [loading, setLoading] = useState(false);
+  const [valid, setValid] = useState(false);
+  const [isModalOpenPayment, setIsModalOpenPayment] = useState(false);
 
   const Finally = lazy(() => import("../components/finally/FinallyVoucher"));
   const formData = useSelector((state) => state.formData.formData);
@@ -65,7 +70,9 @@ const StepWizard = () => {
         formData.userType &&
         formData.financialInstitutionCode &&
         localFormData.address &&
-        localFormData.phone
+        localFormData.phone &&
+        localFormData.departamento &&
+        localFormData.municipio
       );
     }
 
@@ -79,14 +86,16 @@ const StepWizard = () => {
         formData.installments &&
         formData.cvc &&
         localFormData.address &&
-        localFormData.phone
+        localFormData.phone &&
+        localFormData.departamento &&
+        localFormData.municipio
       );
 
     }
 
     // Validación para "ban" (puedes añadir más campos según sea necesario)
     if (type === "BANCOLOMBIA_TRANSFER") {
-      return localFormData.address && localFormData.phone;
+      return localFormData.address && localFormData.phone && localFormData.departamento && localFormData.municipio;
     }
 
     if (type === "NEQUI") {
@@ -164,10 +173,7 @@ const StepWizard = () => {
 
 
  const dataPayment = () => {
-  setLoading(true);
-  setTimeout(() => {
-    setLoading(false);
-  }, 3000);
+
   // Procesar los datos fuera del setFormDataPayment
   const updatedFormData = preparePaymentData();
   console.log("updatedFormData", updatedFormData);
@@ -181,6 +187,7 @@ const StepWizard = () => {
   // Proceder al siguiente paso después de un tiempo
   setTimeout(() => {
     console.log("paidObject", updatedFormData);
+    setIsModalOpenPayment(false);
     nextStep();
   }, 2000);
 };
@@ -217,6 +224,7 @@ const loadPayloadToFormData = (payload) => {
       setDisabled(true);
     } else {
       setDisabled(false);
+      setValid(true);
     }
   };
 
@@ -415,7 +423,11 @@ useEffect(() => {
   else if (currentStep === 4) setStepClass('step-4');
 }, [currentStep]);
 
-  const OpenTerm = () => setIsModalOpenTerm(true);
+  const OpenTerm = () =>  {
+    if (valid) {
+    setIsModalOpenTerm(true);
+    }
+  };
   const handleCloseModalTerm = () => setIsModalOpenTerm(false);
 
   const handleNextToConfirm = () => {
@@ -424,8 +436,19 @@ useEffect(() => {
   const handleCloseModalConfirm = () => setIsModalOpenConfirm(false);
 
 
+          
+  const OpenModalPayment = () =>  {
+    setIsModalOpenPayment(true);
+  };
+
+  const handleCloseModalPayment = () => setIsModalOpenPayment(false);
+
+     
   return (
-        <div className="relative w-full max-w-4xl mx-auto bg-white p-6 h-auto shadow-md rounded-md" onChange={() => setIsDirty(true)}  >
+    <main>
+
+        <Header />
+        <div className="mt-4 relative w-full max-w-5xl mx-auto bg-white p-6 h-auto shadow-md rounded-md" onChange={() => setIsDirty(true)}  >
                <Stepper currentStep={currentStep} />
         {/* Contenedor de los pasos */}
       
@@ -483,7 +506,7 @@ useEffect(() => {
             <button
               onClick={prevStep}
               disabled={currentStep === 1}
-              className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 disabled:bg-gray-200"
+              className="px-4 py-2 text-white font-semibold rounded-md bg-pink-600 hover:bg-orange-500 disabled:bg-gray-200 transition-all"
             >
               Anterior
             </button>
@@ -498,11 +521,11 @@ useEffect(() => {
               </button>
             ) : isUserRegistered && currentStep === 2 ? ( 
               <button
-                onClick={dataPayment}
+                onClick={OpenModalPayment}
                 disabled={isButtonDisabled}
                 className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50"
               >
-              {loading ? <Loader /> : "Siguiente"}
+                Siguiente
               </button>
                ) : isUserRegistered && currentStep === 3 ? ( 
               <button
@@ -529,8 +552,13 @@ useEffect(() => {
               isOpen={isModalOpen} 
               onClose={handleCloseModal} 
             />
+            <ModalPayment isOpenTerm={isModalOpenPayment} onCloseTerm={handleCloseModalPayment} dataPayment={dataPayment} />
+
       </div>
 
+        <Footer />
+    </main>
+      
     // <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
     //   <div className="w-full max-w-5xl bg-white  shadow-lg rounded-lg p-8">
     //   <div className="flex justify-between mt-6">  

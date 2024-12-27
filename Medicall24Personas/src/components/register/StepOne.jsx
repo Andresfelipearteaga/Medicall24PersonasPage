@@ -14,6 +14,7 @@ const StepOne = ({ onRegisterData, modalOpen, next, onSuccessfulRegistration, re
   const [isUserRegistered, setIsUserRegistered] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [typeIds, setTypeIds] = useState([]);
   const [formErrors, setFormErrors] = useState({
     identification: '',
@@ -50,6 +51,10 @@ const StepOne = ({ onRegisterData, modalOpen, next, onSuccessfulRegistration, re
 
       const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
+      };
+
+      const toggleConfirmPasswordVisibility = () => {
+        setShowConfirmPassword(!showConfirmPassword);
       };
 
       // Validar identificación
@@ -195,7 +200,7 @@ const handleChangePassword = (e) => {
       <div className="bg-white rounded-lg p-6 w-full">
         <form className="space-y-6" autoComplete="off">
           {/* Fila 1 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
             <div>
               <label className="block text-gray-700 font-medium mb-1" htmlFor="typeId">Tipo de Identificación</label>
               <select
@@ -226,8 +231,10 @@ const handleChangePassword = (e) => {
                 name="identification"
                 value={formData.user.identification || ""}
                 disabled={isUserRegistered} 
-                onChange={handleChange}
-                onBlur={checkUserRegistration}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  handleChange({ target: { name: "identification", value } });
+                }}                onBlur={checkUserRegistration}
                 className={`w-full px-4 py-2 disabled:bg-gray-200 disabled:text-gray-600 border-2 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${formErrors.identification ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'}`}
                 />
                 {formErrors.identification && (
@@ -237,7 +244,7 @@ const handleChangePassword = (e) => {
           </div>
 
           {/* Fila 2 */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-4 md:grid-cols-1 gap-4">
             <div>
               <label className="block text-gray-700 font-medium mb-1" htmlFor="name1"><span className="text-red-600">*</span> Primer Nombre</label>
               <input
@@ -314,48 +321,61 @@ const handleChangePassword = (e) => {
           </div>
 
          {/* Fila 4 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-700 font-medium mb-1" htmlFor="name2"><span className="text-red-600">*</span> Contraseña</label>
-              <div className="flex items-center space-x-2">
-              <input
-                required
-                type={showPassword ? "text" : "password"}
-                id="password"
-                name="password"
-                value={formData.user.password || ""}
-                disabled={isUserRegistered} 
-                onChange={handleChangePassword}
-                className="w-full px-4 py-2 border-2 disabled:bg-gray-200 disabled:text-gray-600  rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
-              />
-              <button type="button" onClick={togglePasswordVisibility} className="text-gray-600 hover:text-gray-800 focus:outline-none">
-                {showPassword ? (
-                  <img src={visibility} alt="show password" className="w-5 h-5" />
-                ) : (
-                  <img src={visibilityOff} alt="hide password" className="w-5 h-5" />
-                )}
-              </button>
-              </div>
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1" htmlFor="lastName1"><span className="text-red-600">*</span> Confirmar Contraseña</label>
-              <input
-                required
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={confirmPassword}
-                onChange={handleChangePassword}
-                disabled={isUserRegistered} 
-                className={`w-full px-4 py-2 border-2 disabled:bg-gray-200 disabled:text-gray-400  disabled:text-gray-600 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${
-                    passwordError ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'
-                  }`}
-              />
-                      {passwordError && (
-          <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
-        )}
-            </div>
-          </div>    
+         { !isUserRegistered && (
+         <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
+         <div>
+           <label className="block text-gray-700 font-medium mb-1" htmlFor="name2"><span className="text-red-600">*</span> Contraseña</label>
+           <div className="flex items-center space-x-2">
+           <input
+             required
+             type={showPassword ? "text" : "password"}
+             id="password"
+             name="password"
+             value={formData.user.password || ""}
+             disabled={isUserRegistered} 
+             onChange={handleChangePassword}
+             className="w-full px-4 py-2 border-2 disabled:bg-gray-200 disabled:text-gray-600  rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
+           />
+           <button type="button" onClick={togglePasswordVisibility} className="text-gray-600 hover:text-gray-800 focus:outline-none">
+             {showPassword ? (
+               <img src={visibility} alt="show password" className="w-5 h-5" />
+             ) : (
+               <img src={visibilityOff} alt="hide password" className="w-5 h-5" />
+             )}
+           </button>
+           </div>
+         </div>
+         <div>
+           <label className="block text-gray-700 font-medium mb-1" htmlFor="lastName1"><span className="text-red-600">*</span> Confirmar Contraseña</label>
+           <div className="flex items-center space-x-2">
+           <input
+             required
+             type={showConfirmPassword ? "text" : "password"}
+             id="confirmPassword"
+             name="confirmPassword"
+             value={confirmPassword}
+             onChange={handleChangePassword}
+             disabled={isUserRegistered} 
+             className={`w-full px-4 py-2 border-2 disabled:bg-gray-200 disabled:text-gray-400  disabled:text-gray-600 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${
+                 passwordError ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'
+               }`}
+           />
+           <button type="button" onClick={toggleConfirmPasswordVisibility} className="text-gray-600 hover:text-gray-800 focus:outline-none">
+             {showConfirmPassword ? (
+               <img src={visibility} alt="show password" className="w-5 h-5" />
+             ) : (
+               <img src={visibilityOff} alt="hide password" className="w-5 h-5" />
+             )}
+           </button>
+           </div>
+
+                   {passwordError && (
+       <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
+     )}
+         </div>
+       </div> 
+         )}
+      
         </form>
         <p className="mt-5"><span className="text-red-600" >*</span>Campos obligatorios</p>
       </div>

@@ -6,7 +6,7 @@ const Stepper = ({ currentStep }) => {
     ];
   
     return (
-      <ol className="items-center justify-center w-full space-y-4 sm:flex sm:space-x-8 sm:space-y-0 rtl:space-x-reverse">
+      <ol className="items-center justify-center sm:w-full sm:space-y-4 flex space-x-8 space-y-0 rtl:space-x-reverse">
         {steps.map((step) => {
           const isCompleted = step.id < currentStep;
           const isActive = step.id === currentStep;
