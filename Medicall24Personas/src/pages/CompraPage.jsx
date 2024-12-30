@@ -19,6 +19,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setUpdatedFormDataPaid } from "../store/slices/paidObject";
 import usePreventUnload from "../hooks/usePreventUnload";
 import ModalPayment from "../components/modals/ModalPayment";
+import BuyFailed from "../components/modals/BuyFailed";
 
 
 
@@ -47,6 +48,9 @@ const StepWizard = () => {
   const [loading, setLoading] = useState(false);
   const [valid, setValid] = useState(false);
   const [isModalOpenPayment, setIsModalOpenPayment] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showPasswordisUserRegistered, setShowPasswordisUserRegistered] = useState(true);
+
 
   const Finally = lazy(() => import("../components/finally/FinallyVoucher"));
   const formData = useSelector((state) => state.formData.formData);
@@ -282,6 +286,7 @@ const loadPayloadToFormData = (payload) => {
         setStatus("success");
         setIsSuccess(true);
         setIsUserRegistered(true)
+        showPassword();
       } else if (response.data.error) {
         setStatus("error");
         setIsSuccess(false);
@@ -295,6 +300,10 @@ const loadPayloadToFormData = (payload) => {
 
   const registered = () => {
     setIsUserRegistered(true)
+  }
+
+  const showPassword = () => {
+    setShowPasswordisUserRegistered(true)
   }
 
   // Cerrar el modal y redirigir si es exitoso
@@ -379,6 +388,7 @@ const loadPayloadToFormData = (payload) => {
       };
     } catch (error) {
       console.error("Error en la compra:", error.message);
+      setShowErrorModal(true);
       return {
         success: false,
         error: error.message,
@@ -449,7 +459,7 @@ useEffect(() => {
 
         <Header />
         <div className="mt-4 relative w-full max-w-5xl mx-auto bg-white p-6 h-auto shadow-md rounded-md" onChange={() => setIsDirty(true)}  >
-               <p className="text-center text-4xl text-gray-600 mb-4">Registro de usuario en MEDICALL24</p>
+               <p className="text-center text-4xl text-gray-600 sm:text-2xl mb-4">PASOS PARA REALIZAR LA COMPRA</p>
                <Stepper currentStep={currentStep} />
         {/* Contenedor de los pasos */}
       
@@ -461,7 +471,7 @@ useEffect(() => {
               currentStep === 1 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full pointer-events-none"
             }`}
           >
-            <StepOne onRegisterData={onRegisterData} modalOpen={modalOpen} next={next} onSuccessfulRegistration={isUserRegistered} registered={registered} />
+            <StepOne onRegisterData={onRegisterData} modalOpen={modalOpen} next={next} onSuccessfulRegistration={isUserRegistered} registered={registered} showPasswordisUserRegistered={showPasswordisUserRegistered} />
           </div>
           {/* Paso 2 */}
           <div
@@ -515,7 +525,7 @@ useEffect(() => {
 
             {isUserRegistered && currentStep === 1 ? ( 
               <button
-                className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50"
+                className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 transition-all disabled:opacity-50"
                 onClick={nextStep}
               >
                 Siguiente
@@ -524,22 +534,22 @@ useEffect(() => {
               <button
                 onClick={OpenModalPayment}
                 disabled={isButtonDisabled}
-                className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50"
+                className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 transition-all disabled:opacity-50"
               >
                 Siguiente
               </button>
                ) : isUserRegistered && currentStep === 3 ? ( 
               <button
                 onClick={performPurchase}
-                className="w-auto px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-500 focus:outline-none focus:ring-4 focus:ring-green-600 transition-all disabled:opacity-50"
+                className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 transition-all disabled:opacity-50"
               >
-                {loading ? <Loader /> : "Comprar"}
+                {loading ? <Loader /> : "Pagar"}
               </button>
             ) : currentStep != 4 && ( // Si no está registrado y no es el paso 3
               <button
                 onClick={OpenTerm}
                 disabled={disabled}
-                className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-pink-600 transition-all disabled:opacity-50"
+                className="w-auto px-4 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-4 transition-all disabled:opacity-50"
               >
                 Registrarse
               </button>
@@ -554,6 +564,10 @@ useEffect(() => {
               onClose={handleCloseModal} 
             />
             <ModalPayment isOpenTerm={isModalOpenPayment} onCloseTerm={handleCloseModalPayment} dataPayment={dataPayment} />
+            <BuyFailed
+            isVisible={showErrorModal}
+            onClose={() => setShowErrorModal(false)}
+          />
 
       </div>
 

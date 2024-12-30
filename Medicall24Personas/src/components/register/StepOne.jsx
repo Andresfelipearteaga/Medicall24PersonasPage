@@ -5,14 +5,13 @@ import visibilityOff from "../../assets/SVG/visibility_off.svg";
 import visibility from "../../assets/SVG/visibility.svg";
 // import usePreventUnload from "../../hooks/usePreventUnload";
 
-const StepOne = ({ onRegisterData, modalOpen, next, onSuccessfulRegistration, registered }) => {
+const StepOne = ({ onRegisterData, modalOpen, next, onSuccessfulRegistration, registered, showPasswordisUserRegistered }) => {
     // const [isDirty, setIsDirty] = usePreventUnload();
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const [isUserRegistered, setIsUserRegistered] = useState(false);
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [typeIds, setTypeIds] = useState([]);
@@ -198,55 +197,62 @@ const handleChangePassword = (e) => {
 
   return (
       <div className="bg-white rounded-lg p-6 w-full">
-        <form className="space-y-6" autoComplete="off">
-          {/* Fila 1 */}
-          <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
-            <div>
-              <label className="block text-gray-700 font-medium mb-1" htmlFor="typeId">Tipo de Identificación</label>
-              <select
-                required
-                id="typeId"
-                name="typeId"
-                value={formData.user.typeId || ""}
-                disabled={isUserRegistered} 
-                onChange={handleChange}
-                onBlur={checkUserRegistration}
-                className="w-full px-4 py-2 border-2 disabled:text-gray-600 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200"
-              >
-                <option value="">Seleccione</option>
-                {typeIds.map((type) => (
-                <option key={type.code} value={type.code}>
-                  {type.description}
-                </option>
-              ))}
-              </select>
-            </div>
+       <form className="space-y-4" autoComplete="off">
+  {/* Fila 1 */}
+  <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 gap-3">
+    <div>
+      <label className="block text-gray-700 font-medium text-sm mb-1" htmlFor="typeId">
+        Tipo de Identificación
+      </label>
+      <select
+        required
+        id="typeId"
+        name="typeId"
+        value={formData.user.typeId || ""}
+        disabled={isUserRegistered}
+        onChange={handleChange}
+        onBlur={checkUserRegistration}
+        className="w-full px-3 py-1.5 text-sm border-2 disabled:text-gray-600 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200"
+      >
+        <option value="">Seleccione</option>
+        {typeIds.map((type) => (
+          <option key={type.code} value={type.code}>
+            {type.description}
+          </option>
+        ))}
+      </select>
+    </div>
 
-            <div>
-              <label className="block text-gray-700 font-medium mb-1" htmlFor="identification"><span className="text-red-600">*</span> Identificación</label>
-              <input
-                required
-                type="text"
-                id="identification"
-                name="identification"
-                value={formData.user.identification || ""}
-                disabled={isUserRegistered} 
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, "");
-                  handleChange({ target: { name: "identification", value } });
-                }}                onBlur={checkUserRegistration}
-                className={`w-full px-4 py-2 disabled:bg-gray-200 disabled:text-gray-600 border-2 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${formErrors.identification ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'}`}
-                />
-                {formErrors.identification && (
-                  <p className="text-red-500 text-sm mt-1">{formErrors.identification}</p>
-                )}
-            </div>
-          </div>
+    <div>
+      <label className="block text-gray-700 font-medium text-sm mb-1" htmlFor="identification">
+        <span className="text-red-600">*</span> Identificación
+      </label>
+      <input
+        required
+        type="text"
+        id="identification"
+        name="identification"
+        value={formData.user.identification || ""}
+        disabled={isUserRegistered}
+        onChange={(e) => {
+          const value = e.target.value.replace(/\D/g, "");
+          handleChange({ target: { name: "identification", value } });
+        }}
+        onBlur={checkUserRegistration}
+        className={`w-full px-3 py-1.5 text-sm border-2 disabled:bg-gray-200 disabled:text-gray-600 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${
+          formErrors.identification ? "border-red-500 focus:ring-red-500" : "focus:ring-pink-600"
+        }`}
+      />
+      {formErrors.identification && (
+        <p className="text-red-500 text-xs mt-1">{formErrors.identification}</p>
+      )}
+    </div>
+  </div>
 
-          {/* Fila 2 */}
-          <div className="grid grid-cols-4 md:grid-cols-1 gap-4">
-            <div>
-              <label className="block text-gray-700 font-medium mb-1" htmlFor="name1"><span className="text-red-600">*</span> Primer Nombre</label>
+  {/* Fila 2 */}
+  <div className="grid grid-cols-4 md:grid-cols-2 sm:grid-cols-1 gap-3">
+  <div>
+              <label className="block text-gray-700 text-sm  font-medium mb-1" htmlFor="name1"><span className="text-red-600">*</span> Primer Nombre</label>
               <input
                 required
                 type="text"
@@ -255,12 +261,12 @@ const handleChangePassword = (e) => {
                 value={formData.user.name1 || ""}
                 disabled={isUserRegistered} 
                 onChange={handleChange}
-                className="w-full px-4 py-2 disabled:bg-gray-200 disabled:text-gray-600 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
+                className="w-full px-4 py-2 text-sm disabled:bg-gray-200 disabled:text-gray-600 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-1" htmlFor="name2">Segundo Nombre</label>
+              <label className="block text-gray-700 text-sm font-medium mb-1" htmlFor="name2">Segundo Nombre</label>
               <input
                 type="text"
                 id="name2"
@@ -268,12 +274,12 @@ const handleChangePassword = (e) => {
                 value={formData.user.name2 || ""}
                 disabled={isUserRegistered} 
                 onChange={handleChange}
-                className="w-full px-4 py-2 disabled:bg-gray-200 disabled:text-gray-600 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
+                className="w-full px-4 py-2 text-sm disabled:bg-gray-200 disabled:text-gray-600 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-1" htmlFor="lastName1"><span className="text-red-600">*</span> Primer Apellido</label>
+              <label className="block text-gray-700 text-sm font-medium mb-1" htmlFor="lastName1"><span className="text-red-600">*</span> Primer Apellido</label>
               <input
                 type="text"
                 required
@@ -282,12 +288,12 @@ const handleChangePassword = (e) => {
                 value={formData.user.lastName1 || ""}
                 disabled={isUserRegistered} 
                 onChange={handleChange}
-                className="w-full px-4 py-2 disabled:bg-gray-200 disabled:text-gray-600 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
+                className="w-full px-4 py-2 text-sm disabled:bg-gray-200 disabled:text-gray-600 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-1" htmlFor="lastName2">Segundo Apellido</label>
+              <label className="block text-gray-700 text-sm font-medium mb-1" htmlFor="lastName2">Segundo Apellido</label>
               <input
                 type="text"
                 id="lastName2"
@@ -295,88 +301,89 @@ const handleChangePassword = (e) => {
                 value={formData.user.lastName2 || ""}
                 disabled={isUserRegistered} 
                 onChange={handleChange}
-                className="w-full px-4 py-2 disabled:bg-gray-200 disabled:text-gray-600 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
+                className="w-full px-4 py-2 text-sm disabled:bg-gray-200 disabled:text-gray-600 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
               />
             </div>
-          </div>
+  </div>
 
-          {/* Fila 3 */}
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-          <div>
-              <label className="block text-gray-700 font-medium mb-1" htmlFor="name1"><span className="text-red-600">*</span> Correo Electrónico</label>
-              <input
-                required
-                type="email"
-                id="email"
-                name="email"
-                value={formData.user.email || ""}
-                disabled={isUserRegistered} 
-                onChange={handleChange}
-                className={`w-full px-4 py-2 disabled:bg-gray-200 border-2 disabled:text-gray-600 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${formErrors.email ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'}`}
-                />
-                {formErrors.email && (
-                  <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>
-                )}
-            </div>
-          </div>
+  {/* Fila 3 */}
+  <div className="grid grid-cols-1 md:grid-cols-1 gap-3">
+    <div>
+      <label className="block text-gray-700 font-medium text-sm mb-1" htmlFor="email">
+        <span className="text-red-600">*</span> Correo Electrónico
+      </label>
+      <input
+        required
+        type="email"
+        id="email"
+        name="email"
+        value={formData.user.email || ""}
+        disabled={isUserRegistered}
+        onChange={handleChange}
+        className={`w-full px-3 text-sm py-1.5 border-2 disabled:bg-gray-200 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${
+          formErrors.email ? "border-red-500 focus:ring-red-500" : "focus:ring-pink-600"
+        }`}
+      />
+      {formErrors.email && <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>}
+    </div>
+  </div>
 
-         {/* Fila 4 */}
-         { !isUserRegistered && (
-         <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
-         <div>
-           <label className="block text-gray-700 font-medium mb-1" htmlFor="name2"><span className="text-red-600">*</span> Contraseña</label>
-           <div className="flex items-center space-x-2">
-           <input
-             required
-             type={showPassword ? "text" : "password"}
-             id="password"
-             name="password"
-             value={formData.user.password || ""}
-             disabled={isUserRegistered} 
-             onChange={handleChangePassword}
-             className="w-full px-4 py-2 border-2 disabled:bg-gray-200 disabled:text-gray-600  rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
-           />
-           <button type="button" onClick={togglePasswordVisibility} className="text-gray-600 hover:text-gray-800 focus:outline-none">
-             {showPassword ? (
-               <img src={visibility} alt="show password" className="w-5 h-5" />
-             ) : (
-               <img src={visibilityOff} alt="hide password" className="w-5 h-5" />
-             )}
-           </button>
-           </div>
+  {/* Fila 4 */}
+  {showPasswordisUserRegistered && (
+       <div className="grid grid-cols-2 md:grid-cols-1 sm:grid-cols-1 gap-4">
+       <div>
+         <label className="block text-gray-700  text-sm font-medium mb-1" htmlFor="name2"><span className="text-red-600">*</span> Contraseña</label>
+         <div className="flex items-center space-x-2">
+         <input
+           required
+           type={showPassword ? "text" : "password"}
+           id="password"
+           name="password"
+           value={formData.user.password || ""}
+           disabled={isUserRegistered} 
+           onChange={handleChangePassword}
+           className="w-full px-4  text-sm py-2 border-2 disabled:bg-gray-200 disabled:text-gray-600  rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
+         />
+         <button type="button" onClick={togglePasswordVisibility} className="text-gray-600 hover:text-gray-800 focus:outline-none">
+           {showPassword ? (
+             <img src={visibility} alt="show password" className="w-5 h-5" />
+           ) : (
+             <img src={visibilityOff} alt="hide password" className="w-5 h-5" />
+           )}
+         </button>
          </div>
-         <div>
-           <label className="block text-gray-700 font-medium mb-1" htmlFor="lastName1"><span className="text-red-600">*</span> Confirmar Contraseña</label>
-           <div className="flex items-center space-x-2">
-           <input
-             required
-             type={showConfirmPassword ? "text" : "password"}
-             id="confirmPassword"
-             name="confirmPassword"
-             value={confirmPassword}
-             onChange={handleChangePassword}
-             disabled={isUserRegistered} 
-             className={`w-full px-4 py-2 border-2 disabled:bg-gray-200 disabled:text-gray-400  disabled:text-gray-600 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${
-                 passwordError ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'
-               }`}
-           />
-           <button type="button" onClick={toggleConfirmPasswordVisibility} className="text-gray-600 hover:text-gray-800 focus:outline-none">
-             {showConfirmPassword ? (
-               <img src={visibility} alt="show password" className="w-5 h-5" />
-             ) : (
-               <img src={visibilityOff} alt="hide password" className="w-5 h-5" />
-             )}
-           </button>
-           </div>
+       </div>
+       <div>
+         <label className="block text-sm text-gray-700 font-medium mb-1" htmlFor="lastName1"><span className="text-red-600">*</span> Confirmar Contraseña</label>
+         <div className="flex items-center space-x-2">
+         <input
+          required
+          type={showConfirmPassword ? "text" : "password"}
+          id="confirmPassword"
+          name="confirmPassword"
+          value={confirmPassword}
+          onChange={handleChangePassword}
+          disabled={isUserRegistered} 
+          className={`w-full text-sm px-4 py-2 border-2 disabled:bg-gray-200 disabled:text-gray-600 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all ${passwordError ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'}`}
+        />
 
-                   {passwordError && (
-       <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
-     )}
+         <button type="button" onClick={toggleConfirmPasswordVisibility} className="text-gray-600 hover:text-gray-800 focus:outline-none">
+           {showConfirmPassword ? (
+             <img src={visibility} alt="show password" className="w-5 h-5" />
+           ) : (
+             <img src={visibilityOff} alt="hide password" className="w-5 h-5" />
+           )}
+         </button>
          </div>
-       </div> 
-         )}
-      
-        </form>
+
+                 {passwordError && (
+     <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
+   )}
+       </div>
+     </div> 
+  )}
+</form>
+
         <p className="mt-5"><span className="text-red-600" >*</span>Campos obligatorios</p>
       </div>
  

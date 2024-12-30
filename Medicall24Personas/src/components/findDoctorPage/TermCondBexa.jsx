@@ -29,10 +29,15 @@ const TermCondBexa = ( { onCloseTerm }) => {
     <p className="text-sm text-gray-900 mb-4">
     Los servicios de salud del paquete de tamizaje para detectar Cáncer de Mama serán prestados en las siguientes ciudades de Colombia:
     </p>
-    <span>Ciudad</span>
-    <span>Departamento</span>
-    <span>Montería</span>
-    <span>Córdoba</span>
+    <div className="grid w-1/4 sm:w-1/2 grid-cols-2 gap-2 font-bold mb-4">
+      {/* Encabezados */}
+      <div>Ciudad</div>
+      <div>Departamento</div>
+
+      {/* Datos */}
+      <div className="font-normal">Montería</div>
+      <div className="font-normal">Córdoba</div>
+    </div>
     <p className="text-sm text-gray-900 mb-4">
     Para continuar con el pago del paquete de tamizaje para detectar Cáncer de Mama, se deberá realizar el registro de la paciente que será beneficiaria del servicio. Este procedimiento podrá realizarse una vez sean aceptados los términos y condiciones aquí descritos.
     </p>    <p className="text-sm text-gray-900 mb-4">

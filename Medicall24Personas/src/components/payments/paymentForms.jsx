@@ -27,6 +27,8 @@ const PaymentForm = ({ onFormDataChange }) => {
         });
       };
 
+      
+
  // Maneja el cambio de método de pago
 const onMethodChange = (method) => {
   setSelectedMethod(method);
@@ -130,7 +132,7 @@ const onMethodChange = (method) => {
 
   return (
     <div className="w-full mx-auto flex flex-col">
-      <h2 className={`text-2xl font-bold text-gray-700 text-center mb-6 ${selectedMethod === 'CARD' ? 'mt-6': 'mt-0' }`}>
+      <h2 className={`text-2xl font-bold text-gray-700 text-center mb-6 ${selectedMethod === 'CARD' ? 'mt-6': 'mt-6' }`}>
         Selecciona un Método de Pago
       </h2>
       <div className="flex justify-around w-full mb-8">
@@ -217,43 +219,45 @@ const onMethodChange = (method) => {
       <div className="flex-grow p-4 rounded-lg overflow-y-auto" style={{ minHeight: "250px" }}>
         {selectedMethod === "CARD" && (
           <div className="animate-fade-in">
-            <h3 className="text-lg font-bold mb-4">Pago con Tarjeta</h3>
-            <form className="space-y-4">
+            <h3 className="text-base font-bold mb-4">Pago con Tarjeta</h3>
+            <form className="space-y-2">
               <div>
-                <label htmlFor="cardNumber" className="block font-medium mb-2">
+                <label htmlFor="cardNumber" className="block font-medium mb-2 text-sm">
                   Número de Tarjeta sin espacios
                 </label>
                 <input
                   type="text"
                   id="cardNumber"
                   placeholder="XXXXXXXXXXXXXXXX"
-                  className="w-full p-2 border border-gray-300 rounded"
-
-                  onChange={(e) => handleInputChange("number", e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded text-sm"
+                  onChange={(e) => { 
+                    const value = e.target.value.replace(/\D/g, "");
+                    handleInputChange("number", value)}}
+                  value={formValues.number || ""}
                 />
               </div>
 
               <div>
-              <label htmlFor="cardName" className="block font-medium mb-2">
+              <label htmlFor="cardName" className="block font-medium mb-2 text-sm">
                 Nombre de la Tarjeta
               </label>
               <input
                 type="text"
                 id="cardName"
                 placeholder=""
-                className="w-full p-2 border border-gray-300 rounded"
+                className="w-full p-2 border border-gray-300 rounded text-sm"
 
                 onChange={(e) => handleInputChange("cardHolder", e.target.value)}
               />
             </div>
             <div className="flex gap-2 justify-between">
               <div>
-                <label htmlFor="month" className="block font-medium mb-2">
+                <label htmlFor="month" className="block font-medium mb-2 text-sm">
                   Fecha de Expiración
                 </label>
                 <select
                   id="month"
-                  className="p-2 border border-gray-300 rounded w-16 mr-2"
+                  className="p-2 border border-gray-300 rounded w-16 mr-2 text-sm"
 
                   onChange={(e) => handleInputChange("expMonth", e.target.value)}
                 >
@@ -266,7 +270,7 @@ const onMethodChange = (method) => {
                 </select>
                 <select
                   id="year"
-                  className="p-2 border border-gray-300 rounded w-16"
+                  className="p-2 border border-gray-300 rounded w-16 text-sm"
 
                   onChange={(e) => handleInputChange("expYear", e.target.value)}
                 >
@@ -283,12 +287,12 @@ const onMethodChange = (method) => {
                 </select>
               </div>
               <div>
-                <label htmlFor="installments" className="block font-medium mb-2">
+                <label htmlFor="installments" className="block font-medium mb-2 text-sm">
                   Cuotas
                 </label>
                 <select
                   id="installments"
-                  className="p-2 border border-gray-300 rounded w-20"
+                  className="p-2 border border-gray-300 rounded w-20 text-sm"
                   onChange={(e) => handleInputChange("installments", e.target.value)}
                 >
                   <option value=""></option>
@@ -300,34 +304,38 @@ const onMethodChange = (method) => {
                 </select>
               </div>
               <div>
-                <label htmlFor="cvc" className="block font-medium mb-2">
+                <label htmlFor="cvc" className="block font-medium mb-2 text-sm">
                   CVC
                 </label>
                 <input
                   type="text"
                   id="cvv"
+                  maxLength="3"
                   placeholder="XXX"
-                  className="w-20 p-2 border border-gray-300 rounded"
-                  onChange={(e) => handleInputChange("cvc", e.target.value)}
+                  className="w-20 p-2 border border-gray-300 rounded text-sm"
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    handleInputChange("cvc", value)}}
+                  value={formValues.cvc || ""}
+
                 />
               </div>
               </div>
-              {/* Otros campos de tarjeta */}
             </form>
           </div>
         )}
 
         {selectedMethod === "PSE" && (
           <div className="animate-fade-in">
-            <h3 className="text-lg font-bold mb-4">Pago con PSE</h3>
+            <h3 className="text-base font-bold mb-4">Pago con PSE</h3>
             <form className="space-y-4">
               <div>
-                <label htmlFor="person" className="block font-medium mb-2">
+                <label htmlFor="person" className="block font-medium mb-2 text-sm">
                   Tipo de persona
                 </label>
                 <select
                   id="person"
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded text-sm"
                   onChange={(e) => handleInputChange("userType", e.target.value)}
                 >
                   <option value="" disabled selected>
@@ -338,12 +346,12 @@ const onMethodChange = (method) => {
                 </select>
               </div>
               <div>
-              <label htmlFor="bank" className="block font-medium mb-2">
+              <label htmlFor="bank" className="block font-medium mb-2 text-sm">
                 Lista de Bancos
               </label>
               <select
                 id="bank"
-                className="w-full p-2 border border-gray-300 rounded"
+                className="w-full p-2 border border-gray-300 rounded text-sm"
                 onChange={(e) => handleInputChange("financialInstitutionCode", e.target.value)}
               >
                 <option value="" disabled selected>Seleccione el banco</option>
@@ -403,3 +411,8 @@ const onMethodChange = (method) => {
 };
 
 export default PaymentForm;
+
+
+
+
+

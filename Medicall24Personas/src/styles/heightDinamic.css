@@ -1,17 +1,24 @@
 /* Archivo styles.css */
-.step-1, .step-3 {
-    height: 30rem;
+.step-1 {
+    height: 25em;
   }
   
   .step-2 {
     height: 40rem;
   }
   
+  .step-3 {
+    height: 30rem;
+  }
+
   .step-4 {
     height: 46rem;
   }
 
   @media (max-width: 1024px) {
+    .step-1 {
+      height: 35rem;
+    }
   
     .step-2 {
       height: 105rem;
@@ -24,11 +31,11 @@
   
   @media (max-width: 768px) {
     .step-1{
-      height: 60rem; 
+      height: 50rem; 
     }
   
     .step-2 {
-      height: 115rem;
+      height: 80rem;
     }
     .step-3 {
     height: 35rem;

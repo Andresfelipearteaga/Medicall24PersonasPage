@@ -33,7 +33,7 @@ const Modal = ({ isOpenConfirm, onCloseConfirm, payload, registrar }) => {
   
     return (
       <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
-        <div className="bg-white rounded-lg shadow-lg w-1/2">
+        <div className="bg-white rounded-lg shadow-lg w-1/2 sm:w-full">
           {/* Encabezado */}
           <div className="bg-pink-600 text-white text-lg font-bold py-4 px-6 rounded-t-lg text-center">
             Confirmar

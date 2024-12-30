@@ -6,7 +6,7 @@ export default {
   ],
   theme: {
     extend: {
-      screens: { 'sm': { 'max': '768px' }, 'md': { 'max': '1024px' }},
+      screens: { 'sm': { 'max': '768px' }, 'md': { 'min': '769px' ,'max': '1024px' }},
 
       animation: {
         "fade-in": "fadeIn 0.5s ease-in-out",

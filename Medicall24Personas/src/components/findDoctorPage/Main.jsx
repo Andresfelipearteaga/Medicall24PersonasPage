@@ -41,7 +41,7 @@ const MainContent = ( ) => {
     };
 
     const handleInputChange = (e) => {
-      const code = e.target.value.toUpperCase(); // Asegurar que sea insensible a mayúsculas/minúsculas
+      const code = e.target.value.toUpperCase(); 
       setPromoCode(code);
   
       if (promoCodes[code]) {
@@ -59,20 +59,20 @@ const MainContent = ( ) => {
       <main className="mx-auto space-y-6">
         {/* Section 1: Text Left, Image Right */}
         
-        <section className="grid grid-cols-2 md:grid-cols-1 gap-8 items-center px-24 md:px-8 py-16 h-[600px] md:h-auto bexa">
+        <section className="grid grid-cols-2 md:grid-cols-1 sm:grid-cols-1 gap-8 items-center px-24 md:px-8 py-16 h-[600px] md:h-auto sm:h-auto bexa">
   {/* Contenido */}
-  <div className="space-y-6 md:flex md:flex-col">
-    <h2 className="text-4xl md:text-center md:text-2xl font-extrabold text-gray-600 leading-tight tracking-wide">
+  <div className="space-y-6 md:flex md:flex-col sm:flex sm:flex-col">
+    <h2 className="text-4xl md:text-center md:text-2xl sm:text-2xl font-extrabold text-gray-600 leading-tight tracking-wide">
       Examen BEXA para la detección temprana del cáncer de mama
     </h2>
     <span className="flex items-center space-x-2">
       <ChevronRight className="w-6 h-6 text-pink-600" />
-      <p className="text-gray-700 text-xl md:text-lg">Para mujeres de cualquier edad</p>
+      <p className="text-gray-700 text-xl md:text-lg sm:text-lg">Para mujeres de cualquier edad</p>
     </span>
 
     <span className="flex items-center space-x-2">
       <ChevronRight className="w-6 h-6 text-pink-600" />
-      <p className="text-gray-700 text-xl md:text-lg">
+      <p className="text-gray-700 text-xl md:text-lg sm:text-lg">
         Sin dolor, sin radiación, con resultados inmediatos.
       </p>
     </span>
@@ -100,7 +100,7 @@ const MainContent = ( ) => {
 </section>
 
         <section id="servicio"
-        className="grid grid-cols-2 md:grid-cols-1 gap-12 items-center px-24 py-12 md:px-4"
+        className="grid grid-cols-2 md:grid-cols-1 sm:grid-cols-1 gap-12 items-center px-24 py-12 md:px-4 sm:px-4"
         >
         {/* Contenedor del Video */}
         <div className="space-y-6 p-6">
@@ -116,7 +116,7 @@ const MainContent = ( ) => {
         {/* Contenedor de Información */}
         <div className="space-y-4 p-8 bg-gray-100 rounded-lg shadow-lg transition-transform duration-300">
             {/* Título */}
-            <h2 className="text-4xl md:text-center md:text-2xl font-bold text-gray-600 hover:text-pink-500 transition-colors duration-200">
+            <h2 className="text-4xl md:text-center sm:text-2xl sm:text-center md:text-2xl font-bold text-gray-600 hover:text-pink-500 transition-colors duration-200">
             Paquete de Tamizaje para Detectar Cáncer de Mama
             </h2>
 
@@ -161,12 +161,12 @@ const MainContent = ( ) => {
 
           {/* Campo para ingresar código promocional */}
           <div className="flex flex-col">
-            <label className="text-gray-600 text-lg">Ingrese código promocional</label>
+            <label className="text-gray-600 text-lg">Si tienes un código promocional ingrésalo</label>
             <input
               type="text"
               value={promoCode}
               onChange={handleInputChange}
-              className="border rounded-lg p-2 mt-2"
+              className="border rounded-lg p-2 mt-2 w-56"
               placeholder="Código promocional"
             />
           </div>

@@ -153,16 +153,16 @@ const handleChange = (e) => {
 
 
   return (
-    <div className="bg-white rounded-lg p-6 w-full grid grid-cols-2 md:grid-cols-1 gap-6">
+    <div className="bg-white rounded-lg p-6 w-full grid grid-cols-2 sm:grid-cols-1 md:grid-cols-1 gap-6">
     {/* Columna izquierda */}
     <div>
-      <form className="space-y-6" autoComplete="off">
+      <form className="space-y-2" autoComplete="off">
       <h2 className="text-2xl font-bold text-gray-700 text-center mb-12 mt-6">Datos del comprador</h2>
         {/* Fila 1 */}
         <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
           <div>
             <label
-              className="block text-gray-700 font-medium mb-1"
+              className="block text-gray-700 font-medium text-sm mb-1"
               htmlFor="typeId"
             >
           Tipo de Identificación
@@ -172,7 +172,7 @@ const handleChange = (e) => {
               id="typeId"
               name="typeId"
               value={payload.user?.typeId || ""}
-              className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200"
+              className="w-full text-sm px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200"
             >
               <option value="">Seleccione</option>
               <option value="CC">Cédula de Ciudadanía</option>
@@ -183,7 +183,7 @@ const handleChange = (e) => {
   
           <div>
             <label
-              className="block text-gray-700 font-medium mb-1"
+              className="block text-gray-700 font-medium text-sm mb-1"
               htmlFor="identification"
             >
            Identificación
@@ -194,7 +194,7 @@ const handleChange = (e) => {
               id="identification"
               name="identification"
               value={payload.user?.identification || ""}
-              className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200 disabled:text-gray-600"
+              className="w-full text-sm px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200 disabled:text-gray-600"
             />
           </div>
         </div>
@@ -203,7 +203,7 @@ const handleChange = (e) => {
         <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
           <div>
             <label
-              className="block text-gray-700 font-medium mb-1"
+              className="block text-gray-700 text-sm font-medium mb-1"
               htmlFor="name1"
             >
               Nombres
@@ -214,13 +214,13 @@ const handleChange = (e) => {
               id="names"
               name="names"
               value={fullName}
-              className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200 disabled:text-gray-600"
+              className="w-full text-sm px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200 disabled:text-gray-600"
             />
           </div>
   
           <div>
             <label
-              className="block text-gray-700 font-medium mb-1"
+              className="block text-sm text-gray-700 font-medium mb-1"
               htmlFor="name2"
             >
               Apellidos
@@ -231,7 +231,7 @@ const handleChange = (e) => {
               id="lastNames"
               name="name2"
               value={fullLastName}
-              className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200 disabled:text-gray-600"
+              className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200 disabled:text-gray-600 text-sm"
             />
           </div>
         </div>
@@ -239,7 +239,7 @@ const handleChange = (e) => {
         {/* Fila 3 */}
         <div>
           <label
-            className="block text-gray-700 font-medium mb-1"
+            className="block text-gray-700 text-sm font-medium mb-1"
             htmlFor="email"
           >
            <span className="text-red-600">*</span> Correo Electrónico
@@ -250,7 +250,7 @@ const handleChange = (e) => {
             name="email"
             onChange={handleChange}
             value={localFormData.email}
-            className={`w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200 disabled:text-gray-600 ${formErrors.email ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'}`}
+            className={`w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:outline-none hover:shadow-md text-sm transition-all disabled:bg-gray-200 disabled:text-gray-600 ${formErrors.email ? 'border-red-500 focus:ring-red-500' : 'focus:ring-pink-600'}`}
           />
                     <p className="text-xs text-gray-700">A este correo electrónico se le enviará la información de tu compra.</p>
                   <p className={`text-red-500 text-sm mt-1 ${formErrors.email ? 'opacity-100' : 'opacity-0'}`}>Este campo debe contener un correo electrónico válido.</p>
@@ -260,7 +260,7 @@ const handleChange = (e) => {
         <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
           <div>
             <label
-              className="block text-gray-700 font-medium mb-1"
+              className="block text-gray-700 text-sm font-medium mb-1"
               htmlFor="address"
             >
               <span className="text-red-600">*</span>  Dirección
@@ -273,13 +273,13 @@ const handleChange = (e) => {
               placeholder="Ingresa tu dirección"
               value={localFormData.address}
               onChange={handleChange}
-              className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
+              className="w-full text-sm px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
             />
           </div>
   
           <div>
             <label
-              className="block text-gray-700 font-medium mb-1"
+              className="block text-gray-700 text-sm font-medium mb-1"
               htmlFor="phone"
             >
               <span className="text-red-600">*</span>  Teléfono
@@ -296,14 +296,14 @@ const handleChange = (e) => {
                 const value = e.target.value.replace(/\D/g, "");
                 handleChange({ target: { name: "phone", value } });
               }}
-              className="w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
+              className="w-full px-4 py-2 text-sm border-2 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all"
             />
           </div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
           <div>
             <label
-              className="block text-gray-700 font-medium mb-1"
+              className="block text-gray-700 text-sm font-medium mb-1"
               htmlFor="address"
             >
               <span className="text-red-600">*</span>  Departamento
@@ -314,7 +314,7 @@ const handleChange = (e) => {
             name="departamento"
             value={localFormData.departamento}
             onChange={handleChange}
-            className="w-full px-4 py-2 border-2 disabled:text-gray-600 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200"
+            className="w-full px-4 py-2 border-2 disabled:text-gray-600 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none text-sm hover:shadow-md transition-all disabled:bg-gray-200"
           >
             <option value="">Seleccione</option>
             {departaments.map((departament) => (
@@ -327,7 +327,7 @@ const handleChange = (e) => {
   
           <div>
             <label
-              className="block text-gray-700 font-medium mb-1"
+              className="block text-gray-700 text-sm font-medium mb-1"
               htmlFor="phone"
             >
               <span className="text-red-600">*</span>  Municipio
@@ -338,7 +338,7 @@ const handleChange = (e) => {
           name="municipio"
           value={localFormData.municipio}
           onChange={handleChange}
-          className="w-full px-4 py-2 border-2 disabled:text-gray-600 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200"
+          className="w-full px-4 py-2 border-2 text-sm disabled:text-gray-600 rounded-lg focus:ring-2 focus:ring-pink-600 focus:outline-none hover:shadow-md transition-all disabled:bg-gray-200"
           disabled={!localFormData.departamento} // Deshabilitar hasta seleccionar un departamento
         >
           <option value="">Seleccione</option>

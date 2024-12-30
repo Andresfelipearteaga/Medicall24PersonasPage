@@ -23,7 +23,7 @@ const TermCondBexa = ( { onCloseTerm }) => {
             <CircleX className="w-6 h-6 text-gray-600 hover:text-pink-600 transition-colors duration-200" />
         </button>
         
-    <h1 className="text-xl font-bold text-gray-700 mb-6 text-center uppercase">Términos y condiciones del servicio</h1>
+    <h1 className="text-xl font-bold text-gray-700 mb-6 text-center uppercase">Acepta los Términos y condiciones del servicio</h1>
     <p className="text-sm text-gray-900 mb-4">
     Estos son los Términos y Condiciones para la prestación de los servicios que hacen parte del paquete de tamizaje para detectar Cáncer de Mama, comercializados por MEDICALL24 SAS (en adelante LA COMPAÑIA), por favor lea cuidadosamente.
     </p>
@@ -44,10 +44,15 @@ const TermCondBexa = ( { onCloseTerm }) => {
     <p className="text-sm text-gray-900 mb-4">
     Los servicios de salud del paquete de tamizaje para detectar Cáncer de Mama serán prestados en las siguientes ciudades de Colombia:
     </p>
-    <span>Ciudad</span>
-    <span>Departamento</span>
-    <span>Montería</span>
-    <span>Córdoba</span>
+    <div className="grid w-1/4 sm:w-1/2 grid-cols-2 gap-2 font-bold mb-4">
+      {/* Encabezados */}
+      <div>Ciudad</div>
+      <div>Departamento</div>
+
+      {/* Datos */}
+      <div className="font-normal">Montería</div>
+      <div className="font-normal">Córdoba</div>
+    </div>
     <p className="text-sm text-gray-900 mb-4">
     Para continuar con el pago del paquete de tamizaje para detectar Cáncer de Mama, se deberá realizar el registro de la paciente que será beneficiaria del servicio. Este procedimiento podrá realizarse una vez sean aceptados los términos y condiciones aquí descritos.
     </p>    <p className="text-sm text-gray-900 mb-4">
@@ -68,7 +73,7 @@ const TermCondBexa = ( { onCloseTerm }) => {
             Acepto los términos y condiciones
         </label>
         
-            <div className="px-6 flex justify-between space-x-4 bg-gray-100 rounded-b-lg">
+            <div className="px-6 flex justify-between space-x-4 rounded-b-lg">
               <button
                 onClick={onCloseTerm}
                 className="px-4 py-2 text-white bg-pink-600 rounded-lg hover:bg-pink-700 transition-all"
