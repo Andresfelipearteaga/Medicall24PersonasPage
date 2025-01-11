@@ -6,9 +6,9 @@
     "email": "user@example.com",
     "address": "string",
     "phone": "string",
-    "productId": 16,
+    "productId": "",
     "paymentMethod": {
-      "type": "string",
+      "type": "PSE",
       "installments": 0,
       "card": {
         "number": "string",

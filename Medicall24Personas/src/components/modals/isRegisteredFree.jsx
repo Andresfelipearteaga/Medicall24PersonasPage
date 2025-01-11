@@ -4,7 +4,7 @@ const Modal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center backdrop-blur-sm">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
       <h3 className="text-lg text-center font-semibold text-gray-800">¡Ya te encuentras registrado!</h3>
     <p className="mt-4 text-gray-600 text-center">

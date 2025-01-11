@@ -20,6 +20,14 @@
     z-index: -1;
   }
 
+@media (max-width: 768px) {
+    .bexa::before {
+      background-image: url("https://medicall24.com.co/wp-content/uploads/2024/12/fondo3.png");
+      background-position: 27%;
+  
+    }
+  }
+
 
   
 

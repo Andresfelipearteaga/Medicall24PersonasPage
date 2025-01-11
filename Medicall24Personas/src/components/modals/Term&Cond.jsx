@@ -23,7 +23,7 @@ const TermsModal = ({ isOpenTerm, onCloseTerm, NextToConfirm }) => {
     <div className="flex items-center justify-center h-auto">
       {/* Modal */}
       {isOpenTerm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl">
             {/* Encabezado */}
             <div className="px-6 py-4 bg-pink-600 text-white text-lg font-bold rounded-t-lg">

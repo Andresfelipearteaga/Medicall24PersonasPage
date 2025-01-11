@@ -5,7 +5,7 @@ const ErrorModal = ({ isVisible, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 backdrop-blur-sm"
       onClick={onClose}
     >
       <div

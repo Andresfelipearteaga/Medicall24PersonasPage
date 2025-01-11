@@ -28,7 +28,7 @@ const Modal = ({ isOpen, status, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center backdrop-blur-sm">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
         <h2 className="text-xl font-semibold mb-4 text-center">Estado del Registro</h2>
         {renderContent()}
